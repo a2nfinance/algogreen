@@ -1,12 +1,12 @@
 import { Col, Descriptions, Row } from "antd";
-import { Detail } from "src/components/dao/Detail";
+import { DetailItem } from "src/components/dao/detail/DetailItem";
 import { LoanDetail } from "src/components/loan/LoanDetail";
 
 export default function ID() {
     return (
         <Row gutter={16}>
             <Col span={6}>
-                <Detail />
+                <DetailItem />
             </Col>
             <Col span={18}>
                 <LoanDetail />

@@ -1,34 +1,21 @@
 import { CopyOutlined, LinkOutlined } from '@ant-design/icons';
 import { Button, Card, Descriptions, Space } from 'antd';
-// import { DetailItemSekeleton } from 'src/components/common/DetailItemSkeleton';
-// import { DAO } from 'src/controller/dao/daoSlice';
+import { DAO } from 'src/controller/dao/daoSlice';
 import { useAppSelector } from 'src/controller/hooks';
-// import { daoTypeMap } from 'src/core/constant';
+import { daoTypeMap } from 'src/core/constant';
 import { useAddress } from 'src/hooks/useAddress';
 import { headStyle } from 'src/theme/layout';
 
 
-export const Detail = () => {
-const { getShortAddress, getObjectExplorerURL } = useAddress();
-//   const { daoFromDB } = useAppSelector(state => state.daoDetail)
-
-    const daoFromDB = {
-        title: "Test",
-        dao_type: 1,
-        treasury_address: "aaaa",
-        passing_threshold: "",
-        created_at: "",
-        quorum: "",
-        twitter: "",
-        github: "",
-        discord: ""
-    }
+export const DetailItem = () => {
+  const { getShortAddress, getObjectExplorerURL } = useAddress();
+  const { daoFromDB } = useAppSelector(state => state.daoDetail)
 
   return (
     <Card title={daoFromDB.title} style={{ backgroundColor: "#f5f5f5" }} headStyle={headStyle}>
 
       <Descriptions layout={"vertical"} column={1}>
-        <Descriptions.Item label={"Type"}>{daoFromDB.dao_type}</Descriptions.Item>
+        <Descriptions.Item label={"Type"}>{daoTypeMap[daoFromDB.dao_type]}</Descriptions.Item>
         <Descriptions.Item label={"Treasury"}>
           <Space wrap>
             <Button icon={<LinkOutlined />} onClick={() => window.open(getObjectExplorerURL(daoFromDB.treasury_address), "_blank")}>{getShortAddress(daoFromDB.treasury_address)}</Button>

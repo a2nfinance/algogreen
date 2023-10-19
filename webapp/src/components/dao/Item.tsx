@@ -6,14 +6,14 @@ import { useRouter } from 'next/router';
 // import { useAddress } from 'src/hooks/useAddress';
 import { headStyle } from 'src/theme/layout';
 
-export const Item = ({ index, project }) => {
+export const Item = ({ index, dao }) => {
   const router = useRouter();
 //   const { getShortAddress, getObjectExplorerURL, editDaoLinkWithStatus } = useAddress();
 
   return (
-    <Card key={`dao-${index}`} title={project.title}
+    <Card key={`dao-${index}`} title={dao.title}
       extra={
-        <Button type='primary' onClick={() => {}}>View Detail</Button>
+        <Button type='primary' onClick={() => router.push(`/dao/detail/${dao.id}`)}>View Detail</Button>
       }
       style={{ margin: 5, backgroundColor: "#f5f5f5" }}
       headStyle={headStyle}>
@@ -22,8 +22,8 @@ export const Item = ({ index, project }) => {
 
         {/* <Descriptions.Item label={"Type"}>{daoTypeMap[dao.dao_type]}</Descriptions.Item> */}
         {/* <Descriptions.Item label={"Open"}>{dao.submission_policy === 1 ? "No (Invited members only)" : "Yes (Open to all)" }</Descriptions.Item> */}
-        <Descriptions.Item label={"Description"}>{project.description}</Descriptions.Item>
-        <Descriptions.Item label={"Status"}>{project.status}</Descriptions.Item>
+        <Descriptions.Item label={"Description"}>{dao.description}</Descriptions.Item>
+        <Descriptions.Item label={"Status"}>{dao.status}</Descriptions.Item>
         {/* <Descriptions.Item label={"Address"}>
           <Space wrap>
             <Button icon={<LinkOutlined />} onClick={() => window.open(getObjectExplorerURL(dao.dao_address), "_blank")}>{getShortAddress(dao.dao_address)}</Button>

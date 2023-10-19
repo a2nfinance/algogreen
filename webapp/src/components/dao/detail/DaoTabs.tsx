@@ -1,9 +1,9 @@
 import type { TabsProps } from 'antd';
 import { Tabs } from 'antd';
-// import { Members } from './Members';
-// import { Proposals } from './Proposals';
-// import { TreasuryInfo } from './TreasuryInfo';
-// import { OpenTasks } from './OpenTasks';
+import { Members } from './Members';
+import { Proposals } from './Proposals';
+import { TreasuryInfo } from './TreasuryInfo';
+import { DAOLoans } from 'src/components/dao/detail/DAOLoans';
 
 export const DaoTabs = () => {
 
@@ -11,22 +11,22 @@ export const DaoTabs = () => {
         {
             key: '1',
             label: `Proposals`,
-            children:  <></>//<Proposals />,
+            children:  <Proposals />,
         },
         {
             key: '3',
             label: `Treasury Details`,
-            children: <></>//<TreasuryInfo />,
+            children: <TreasuryInfo />,
         },
         {
             key: '4',
             label: `Members`,
-            children: <></>//<Members />,
+            children: <Members />,
         },
         {
             key: '5',
-            label: `Available Loan`,
-            children: <></>//<OpenTasks />,
+            label: `Loans`,
+            children: <DAOLoans />
         }
     ];
 

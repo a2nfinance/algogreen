@@ -14,10 +14,9 @@ import { GrDocumentTime } from "react-icons/gr";
 import { LiaDiscord } from "react-icons/lia";
 import { RiRefund2Line } from "react-icons/ri";
 import {TbBrandCarbon} from "react-icons/tb";
-
-
 import { Button, Form, Image, Layout, Menu, Space, theme } from 'antd';
 import { useRouter } from 'next/router';
+
 import React, { useState } from "react";
 // import AutoSearch from './common/AutoSearch';
 // import { ConnectButton } from './common/ConnectButton';

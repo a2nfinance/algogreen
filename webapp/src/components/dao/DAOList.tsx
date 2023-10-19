@@ -6,8 +6,9 @@ import { Item } from "./Item";
 
 export const DAOList = () => {
     // const { featuredProjects } = useAppSelector(state => state.project)
-    const featuredProjects = [1,2,3,4,5,6,7,8,9,10].map( m=> {
+    const featuredDAOs = [1,2,3,4,5,6,7,8,9,10].map( m=> {
         return {
+            id: m,
             title: `${m} title`,
             description: `${m} description`,
             status: 0
@@ -30,9 +31,9 @@ export const DAOList = () => {
                 pageSize: 9,
                 align: "center",
             }}
-            dataSource={featuredProjects}
+            dataSource={featuredDAOs}
             renderItem={(item, index) => (
-                <Item index={index} project={item} />
+                <Item index={index} dao={item} />
             )}
         />
 

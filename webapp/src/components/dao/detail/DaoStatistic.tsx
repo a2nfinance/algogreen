@@ -1,9 +1,9 @@
 import { Button, Col, Divider, Drawer, Input, Popover, Row, Select, Space, Statistic } from 'antd';
 import { useCallback, useState } from 'react';
-import { NewTask } from 'src/components/Task/NewTask';
-import { NewPayout } from 'src/components/proposal/NewPayout';
+// import { NewTask } from 'src/components/Task/NewTask';
+// import { NewPayout } from 'src/components/proposal/NewPayout';
 import { useAppSelector } from 'src/controller/hooks';
-import { fundDao } from 'src/core';
+// import { fundDao } from 'src/core';
 
 export const DaoStatistic = () => {
   const { daoOnchain, daoFromDB } = useAppSelector(state => state.daoDetail);
@@ -38,7 +38,7 @@ export const DaoStatistic = () => {
     setOpenTask(false);
   };
   const fund = useCallback(() => {
-    fundDao(token, parseFloat(fundAmount));
+    // fundDao(token, parseFloat(fundAmount));
   }, [token, fundAmount])
 
   return (
@@ -50,10 +50,10 @@ export const DaoStatistic = () => {
         <Statistic title="Proposals" value={daoOnchain.count_proposal} />
       </Col>
       <Col span={3}>
-        <Statistic title="Treasury (NEO)" value={daoOnchain.balance} />
+        <Statistic title="Loans" value={3} />
       </Col>
       <Col span={3}>
-        <Statistic title="Status" value={daoFromDB.status == 1 ? "Active" : "Inactive"} />
+        <Statistic title="Treasury (NEO)" value={daoOnchain.balance} />
       </Col>
       <Col span={12}>
         <p>Actions</p>
@@ -61,9 +61,6 @@ export const DaoStatistic = () => {
 
           <Button type="primary" onClick={() => showDrawer()} ghost>
             New Proposal
-          </Button>
-          <Button type="primary" onClick={() => showTaskDrawer()} ghost>
-            New Task
           </Button>
           <Popover
             content={
@@ -86,13 +83,13 @@ export const DaoStatistic = () => {
         </Space>
 
       </Col>
-      <Drawer title="New Proposal" size="large" placement="right" onClose={onClose} open={open}>
+      {/* <Drawer title="New Proposal" size="large" placement="right" onClose={onClose} open={open}>
         <NewPayout />
       </Drawer>
 
       <Drawer title="New Task" size="large" placement="right" onClose={onCloseTask} open={openTask}>
         <NewTask  />
-      </Drawer>
+      </Drawer> */}
     </Row>
   )
 }
