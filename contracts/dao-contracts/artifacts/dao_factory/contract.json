@@ -1,0 +1,13 @@
+{
+    "name": "DAOFactory",
+    "methods": [
+        {
+            "name": "createDAO",
+            "args": [],
+            "returns": {
+                "type": "uint64"
+            }
+        }
+    ],
+    "networks": {}
+}
