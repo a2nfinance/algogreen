@@ -2,6 +2,10 @@ from pyteal import *
 from beaker import *
 
 class ProposalState:
+    owner = GlobalStateValue(
+        stack_type=TealType.bytes,
+        descr="Owner address"
+    )
     dao_app_id = GlobalStateValue(
         stack_type=TealType.uint64,
         descr="DAO app id"
@@ -37,6 +41,11 @@ class ProposalState:
         descr="Whether this proposal can be excuted early"
     )
 
+    allow_early_repay = GlobalStateValue(
+        stack_type=TealType.uint64,
+        descr="Whether this proposal can be excuted early"
+    )
+
     borrow_amount = GlobalStateValue(
         stack_type=TealType.uint64,
         descr="Borrow amount"
@@ -58,12 +67,22 @@ class ProposalState:
         descr="Whether this proposal executed",
     )
 
-    agree_count = GlobalStateValue(
+    is_repaid = GlobalStateValue(
+        stack_type=TealType.uint64,
+        descr="Whether this proposal executed",
+    )
+
+    executed_at = GlobalStateValue(
+        stack_type=TealType.uint64,
+        descr="When this proposal is executed"
+    )
+
+    agree_counter = GlobalStateValue(
         stack_type=TealType.uint64,
         descr="Agree counter",
     )
 
-    disagree_count = GlobalStateValue(
+    disagree_counter = GlobalStateValue(
         stack_type=TealType.uint64,
         descr="Disagree counter",
     )
@@ -81,65 +100,93 @@ proposal_app = Application(
 
 @proposal_app.create
 def create(
-    dao_app_id: abi.Uint64, 
+    owner: abi.Address,
+    dao_app_id: abi.Application, 
     dao_app_address: abi.Address,
     title: abi.String, 
     start_time: abi.Uint64,
     end_time: abi.Uint64,
     allow_early_execution: abi.Uint64,
+    allow_early_repay: abi.Uint64,
     borrow_amount: abi.Uint64,
     interest_rate: abi.Uint64,
     term: abi.Uint64,
     dao_token: abi.Uint64
     ) -> Expr:
     return Seq(
-        proposal_app.state.dao_app_id.set(dao_app_id.get()),
+        proposal_app.state.owner.set(owner.get()),
+        proposal_app.state.dao_app_id.set(dao_app_id.application_id()),
         proposal_app.state.dao_app_address.set(dao_app_address.get()),
         proposal_app.state.title.set(title.get()),
         proposal_app.state.start_time.set(start_time.get()),
         proposal_app.state.end_time.set(end_time.get()),
         proposal_app.state.allow_early_execution.set(allow_early_execution.get()),
+        proposal_app.state.allow_early_repay.set(allow_early_repay.get()),
         proposal_app.state.borrow_amount.set(borrow_amount.get()),
         proposal_app.state.interest_rate.set(interest_rate.get()),
         proposal_app.state.term.set(term.get()), 
-        proposal_app.state.agree_count.set(Int(0)),
-        proposal_app.state.disagree_count.set(Int(0)),
+        proposal_app.state.agree_counter.set(Int(0)),
+        proposal_app.state.disagree_counter.set(Int(0)),
         proposal_app.state.is_executed.set(Int(0)),
+        proposal_app.state.is_repaid.set(Int(0)),
         proposal_app.state.dao_token.set(dao_token.get())
     )
 
 
-@proposal_app.external
+@proposal_app.external(authorize= Authorize.only(proposal_app.state.dao_app_address.get()))
 def vote(agree: abi.Uint64, *, output: abi.Uint64) -> Expr:
     return Seq(
         Assert(Global.latest_timestamp() >= proposal_app.state.start_time.get()),
         Assert(Global.latest_timestamp() <= proposal_app.state.end_time.get()),
         Assert(proposal_app.state.is_executed.get() == Int(0)),
-        If(agree.get() == Int(0)).Then(proposal_app.state.disagree_count.increment()
+        If(agree.get() == Int(0)).Then(proposal_app.state.disagree_counter.increment()
         ).Else(
-            proposal_app.state.agree_count.increment()
+            proposal_app.state.agree_counter.increment()
         ),
         output.set(Int(1))
     )
 
-@proposal_app.external
-def execute(quorum: abi.Uint64, passing_threshold: abi.Uint64, count_member: abi.Uint64) -> Expr:
+@proposal_app.external(authorize= Authorize.only(proposal_app.state.dao_app_address.get()))
+def execute(quorum: abi.Uint64, passing_threshold: abi.Uint64, count_member: abi.Uint64, borrow_amount: abi.Uint64, proposer: abi.Address, *, output: abi.Uint64) -> Expr:
     return Seq(
+        Assert(count_member.get() > Int(0)),
+        Assert(proposal_app.state.borrow_amount.get() == borrow_amount.get()),
         Assert(proposal_app.state.is_executed.get() == Int(0)),
         If(proposal_app.state.allow_early_execution.get() == Int(0)).Then(
-             Assert(Global.latest_timestamp() >= proposal_app.state.end_time.get())
-             ).Else(
-                 Assert(True)
-             ),
-        # check is able to execute here,
-        
+            Assert(Global.latest_timestamp() >= proposal_app.state.end_time.get())
+        ).Else(
+            Assert(Int(1))
+        ),
+        Assert(is_passed(quorum, passing_threshold, count_member) == Int(1)),
+        Assert(proposal_app.state.owner.get() == proposer.get()),
+        proposal_app.state.is_executed.set(Int(1)),
+        proposal_app.state.executed_at.set(Global.latest_timestamp())
+    )
+
+@proposal_app.external(authorize=Authorize.only(proposal_app.state.dao_app_address.get()))
+def repay(repay_amount: abi.Uint64, owner: abi.Address) -> Expr:
+    return Seq(
+        Assert(proposal_app.state.owner.get() == owner.get()),
+        Assert(proposal_app.state.is_executed.get() == Int(1)),
+        Assert(repay_amount.get() >= proposal_app.state.borrow_amount.get() * (Int(10000) + proposal_app.state.interest_rate.get()) / Int(10000) ),
+        # check time here, check allow repay
+        If(proposal_app.state.allow_early_repay.get() == Int(0)).Then(
+            Assert(Global.latest_timestamp() >= (proposal_app.state.executed_at.get() + proposal_app.state.term.get() * Int(30) * Int(24) * Int(3600)))
+        ).Else(
+            Assert(Global.latest_timestamp() >= proposal_app.state.executed_at.get())
+        )
     )
 
 @proposal_app.external
 def get_aggree_counter(*, output: abi.Uint64):
-    return output.set(proposal_app.state.agree_count.get())
+    return output.set(proposal_app.state.agree_counter.get())
 
 @Subroutine(TealType.uint64)
-def is_able_to_execute(quorum, passing_threshold, count_member):
-    return Int(1)
+def is_passed(quorum: abi.Uint64, passing_threshold: abi.Uint64, count_member: abi.Uint64) -> Expr:
+    count_all_votes = proposal_app.state.agree_counter.get() + proposal_app.state.disagree_counter.get()
+    return And(
+        passing_threshold.get() <= proposal_app.state.agree_counter.get() * Int(100) / count_all_votes,
+        quorum.get() <= count_all_votes * Int(100) / count_member.get()
+    )
+    
 
