@@ -1,6 +1,7 @@
 from beaker import client, localnet, consts
 from algosdk.transaction import PaymentTxn, AssetOptInTxn
 from algosdk.atomic_transaction_composer import TransactionWithSigner
+from algosdk.encoding import decode_address, encode_address
 import time
 from dao import (
     create_proposal,
@@ -70,15 +71,18 @@ dao_app_client.client.send_transaction(
         member.private_key
     )
 )    
-
+dao_app_client.client.send_transaction(
+    AssetOptInTxn(sender.address, sp, membership_token).sign(
+        sender.private_key
+    )
+)    
 ## Add member
-
-dao_app_client.fund(2000)
-dao_app_client.call(add_members, new_members=[member.address], suggested_params=sp)
+dao_app_client.fund(4000)
+dao_app_client.call(add_members, new_members=[sender.address, member.address], suggested_params=sp, accounts=[sender.address, member.address], foreign_assets=[membership_token])
 
 ## check is_member
 
-check_is_member_request = dao_app_client.call(check_is_member, address=member.address)
+check_is_member_request = dao_app_client.call(check_is_member, address=member.address,  foreign_assets=[membership_token])
 
 print("Is added member:", check_is_member_request.return_value)
 
@@ -116,7 +120,7 @@ min_balance = min_balance_req.return_value
 
 print("Minimum balance after proposal creation:", min_balance)
 
-dao_app_client.call(vote, proposal_app_id=proposal_app_id, agree=1)
+dao_app_client.call(vote, proposal_app_id=proposal_app_id, agree=1,  foreign_assets=[membership_token])
 
 # 5. Voting
 

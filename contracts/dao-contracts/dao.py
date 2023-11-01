@@ -106,8 +106,7 @@ def bootstrap(
 
 @dao_app.external
 def check_is_member(
-    address: abi.Account, 
-    membership_token: abi.Asset = dao_app.state.membership_token,  # type: ignore[assignment]
+    address: abi.Account,
     *, 
     output: abi.Uint64
     ) -> Expr:
@@ -118,7 +117,6 @@ def check_is_member(
 @dao_app.external(authorize=Authorize.only_creator())
 def add_new_member(
     new_member: abi.Account,
-    membership_token: abi.Asset = dao_app.state.membership_token,  # type: ignore[assignment]
 ) -> Expr:
     return Seq(
         Assert(is_member(new_member.address()) == Int(0)),
@@ -130,7 +128,6 @@ def add_new_member(
 @dao_app.external(authorize=Authorize.only_creator())
 def add_members(
     new_members: abi.DynamicArray[abi.Address],
-    membership_token: abi.Asset = dao_app.state.membership_token,  # type: ignore[assignment]
     *,
     output: abi.Uint64
     ) -> Expr:
@@ -204,7 +201,6 @@ def create_proposal(
 def vote(
     proposal_app_id: abi.Application, 
     agree: abi.Uint64,
-    membership_token: abi.Asset = dao_app.state.membership_token,  # type: ignore[assignment],
     *,
     output: abi.Uint64
     ) -> Expr:
@@ -290,9 +286,9 @@ def add_member(
 
 @Subroutine(TealType.uint64)
 def is_member(address: Expr) -> Expr:
+    assetbalance = AssetHolding.balance(address, dao_app.state.membership_token.get())
     return Seq(
-        (member:= abi.Address()).set(address),
-        assetbalance:= AssetHolding.balance(member.get(), dao_app.state.membership_token.get()),
+        assetbalance,
         Return(And(
             assetbalance.hasValue(),
             assetbalance.value() > Int(0)
@@ -309,7 +305,7 @@ def send_asset(address: Expr):
                 TxnField.asset_amount: Int(1),
                 TxnField.asset_receiver: address,
                 # TxnField.fee: Int(0),
-                TxnField.asset_sender: Global.current_application_address(),
+                TxnField.asset_sender: Global.current_application_address()
             }
         )
     )
