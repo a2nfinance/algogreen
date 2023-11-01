@@ -154,6 +154,8 @@ do_buy_with_auction_req = mkp_app_client_buyer.call(
     payment=TransactionWithSigner(ptxn, acct2.signer),  
     key=0,
     boxes=[(app_client.app_id, 0)],
+    accounts=[acct1.address],
+    foreign_assets=[asset_id]
 )
 
 get_auction_record_req_after_buy = mkp_app_client_buyer.call(

@@ -174,8 +174,6 @@ def remove_auction(key: abi.Uint64, *, output: abi.Uint64) -> Expr:
 def do_buy_with_auction(
     payment: abi.PaymentTransaction, 
     key: abi.Uint64, 
-    asset_id: abi.Asset = mkp_app.state.asset_id,  # type: ignore[assignment],
-    seller: abi.Account = mkp_app.state.seller, # type: ignore[assignment],
     *, 
     output: abi.Uint64
     ) -> Expr:
@@ -229,7 +227,6 @@ def do_buy_with_auction(
 @mkp_app.external
 def do_buy_without_auction(
     payment: abi.PaymentTransaction, 
-    asset_id: abi.Asset = mkp_app.state.asset_id,  # type: ignore[assignment]
     *, 
     output: abi.Uint64
     ) -> Expr:
