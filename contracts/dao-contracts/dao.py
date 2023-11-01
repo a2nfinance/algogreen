@@ -224,7 +224,7 @@ def execute_proposal(
     proposer: abi.Address
     ) -> Expr:
     return Seq(
-        Assert(Balance(Global.current_application_address()) > borrow_amount.get() + MinBalance(Global.current_application_address()) + Global.min_txn_fee()),
+        Assert(Balance(Global.current_application_address()) >= borrow_amount.get() + MinBalance(Global.current_application_address()) + Global.min_txn_fee()),
         InnerTxnBuilder.Begin(),
         InnerTxnBuilder.MethodCall(
             app_id=proposal_app_id.application_id(),

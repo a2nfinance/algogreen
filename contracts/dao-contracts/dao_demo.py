@@ -12,7 +12,8 @@ from dao import (
     execute_proposal,
     add_members,
     add_new_member,
-    check_is_member
+    check_is_member,
+    repay_proposal
 )
 
 from proposal import (
@@ -86,8 +87,6 @@ check_is_member_request = dao_app_client.call(check_is_member, address=member.ad
 
 print("Is added member:", check_is_member_request.return_value)
 
-exit()
-
 # 4. Create new proposal
 
 ptxn = PaymentTxn(
@@ -98,8 +97,13 @@ ptxn = PaymentTxn(
 )
 
 print("Proposal creation minimum balance:", dao_app.state.new_proposal_min_balance.value)
-
-create_proposal_req = dao_app_client.call(
+dao_app_client_proposer = client.ApplicationClient(
+    client=localnet.get_algod_client(),
+    app=proposal_app,
+    app_id=dao_app_id,
+    signer=proposer.signer
+)
+create_proposal_req = dao_app_client_proposer.call(
     create_proposal,
     seed=TransactionWithSigner(ptxn, proposer.signer),
     title= "Test proposal", 
@@ -128,7 +132,7 @@ proposal_app_client = client.ApplicationClient(
     client=localnet.get_algod_client(),
     app=proposal_app,
     app_id=proposal_app_id,
-    signer=sender.signer
+    signer=member.signer
 )
 
 get_agree_after_voting = proposal_app_client.call(get_aggree_counter)
@@ -149,7 +153,18 @@ execute_and_create_loan = dao_app_client.call(
     execute_proposal, 
     proposal_app_id=proposal_app_id,
     borrow_amount= 1* consts.algo,
-    proposer=sender.address
+    proposer=proposer.address,
+    accounts=[proposer.address]
 )
 
 print("DAO app account Algo - After: ", dao_app_client.get_application_account_info().get("amount"))
+
+# 7. Repay
+ptxn = PaymentTxn(
+        proposer.address,
+        sp,
+        dao_app_client.app_addr,
+        int(1.09 * consts.algo),
+)
+
+result2 = dao_app_client_proposer.call(repay_proposal, repay_txn=TransactionWithSigner(ptxn, proposer.signer), proposal_app_id=proposal_app_id)

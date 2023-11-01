@@ -170,12 +170,12 @@ def repay(repay_amount: abi.Uint64, owner: abi.Address) -> Expr:
         Assert(proposal_app.state.owner.get() == owner.get()),
         Assert(proposal_app.state.is_executed.get() == Int(1)),
         Assert(proposal_app.state.is_repaid.get() == Int(0)),
-        Assert(repay_amount.get() >= proposal_app.state.borrow_amount.get() * (Int(10000) + proposal_app.state.interest_rate.get()) / Int(10000) ),
+        Assert(repay_amount.get() >= proposal_app.state.borrow_amount.get() * (Int(10000) + proposal_app.state.interest_rate.get()) / Int(10000), comment="amount < repay amount"),
         # check time contraints, check allowing repay
         If(proposal_app.state.allow_early_repay.get() == Int(0)).Then(
-            Assert(Global.latest_timestamp() >= (proposal_app.state.executed_at.get() + proposal_app.state.term.get() * Int(30) * Int(24) * Int(3600)))
+            Assert(Global.latest_timestamp() >= (proposal_app.state.executed_at.get() + proposal_app.state.term.get() * Int(30) * Int(24) * Int(3600)), comment="Not repay time")
         ).Else(
-            Assert(Global.latest_timestamp() >= proposal_app.state.executed_at.get())
+            Assert(Global.latest_timestamp() >= proposal_app.state.executed_at.get(), comment="< executed time")
         ),
         proposal_app.state.is_repaid.set(Int(1))
     )
