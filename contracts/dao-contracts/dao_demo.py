@@ -20,11 +20,13 @@ from proposal import (
     # vote
 )
 
-
+# 1. Initilized testing account
 accounts = localnet.kmd.get_accounts()
 sender = accounts[0]
+member = accounts[1]
+proposer = accounts[2]
 
-# DAO app client
+# 2. Deploy a DAO app
 dao_app_client = client.ApplicationClient(
     client=localnet.get_algod_client(),
     app=dao_app,
@@ -35,8 +37,8 @@ dao_app_client = client.ApplicationClient(
 
 
 dao_app_id, dao_addr, _ = dao_app_client.create(title="Test DAO", passing_threshold=20, quorum=50, proposal_submission_policy=1)
-print("DAO app id: ", dao_app_id)
-print("DAO address: ", dao_addr)
+
+print("Created dao app id: ", dao_app_id)
 
 
 min_balance_req = dao_app_client.call(get_minimum_balance)
@@ -44,7 +46,8 @@ min_balance_req = dao_app_client.call(get_minimum_balance)
 min_balance = min_balance_req.return_value
 
 print("Minumum balance:", min_balance)
-# print("Bootstrapping app")
+
+# 3. Bootstrap DAO app
 sp = dao_app_client.get_suggested_params()
 sp.flat_fee = True
 sp.fee = 2000
@@ -59,32 +62,32 @@ result2 = dao_app_client.call(bootstrap, seed=TransactionWithSigner(ptxn, sender
 membership_token = result2.return_value
 print("Token app id:", membership_token)
 
-# Start adding members
+# 3. Initalize member start adding members
 
 ## Opt member account in to asset
 dao_app_client.client.send_transaction(
-    AssetOptInTxn(sender.address, sp, membership_token).sign(
-        sender.private_key
+    AssetOptInTxn(member.address, sp, membership_token).sign(
+        member.private_key
     )
 )    
 
 ## Add member
 
 dao_app_client.fund(2000)
-dao_app_client.call(add_members, new_members=[sender.address], suggested_params=sp)
+dao_app_client.call(add_members, new_members=[member.address], suggested_params=sp)
 
 ## check is_member
 
-check_is_member_request = dao_app_client.call(check_is_member, address=sender.address)
+check_is_member_request = dao_app_client.call(check_is_member, address=member.address)
 
 print("Is added member:", check_is_member_request.return_value)
 
 exit()
 
-# End adding members
+# 4. Create new proposal
 
 ptxn = PaymentTxn(
-        sender.address,
+        proposer.address,
         sp,
         dao_app_client.app_addr,
         dao_app.state.new_proposal_min_balance.value,
@@ -94,7 +97,7 @@ print("Proposal creation minimum balance:", dao_app.state.new_proposal_min_balan
 
 create_proposal_req = dao_app_client.call(
     create_proposal,
-    seed=TransactionWithSigner(ptxn, sender.signer),
+    seed=TransactionWithSigner(ptxn, proposer.signer),
     title= "Test proposal", 
     start_time=0,
     end_time= int(time.time()) + 1000,
@@ -115,7 +118,7 @@ print("Minimum balance after proposal creation:", min_balance)
 
 dao_app_client.call(vote, proposal_app_id=proposal_app_id, agree=1)
 
-# Proposal app client
+# 5. Voting
 
 proposal_app_client = client.ApplicationClient(
     client=localnet.get_algod_client(),
@@ -131,6 +134,8 @@ print("Number of agreements after voting: ", get_agree_after_voting.return_value
 proposal_app_account_address = proposal_app_client.get_application_account_info().get("address")
 
 print("Proposal app account info: ", proposal_app_account_address)
+
+# 6. Proposal execution
 
 dao_app_client.fund(1 * consts.algo)
 

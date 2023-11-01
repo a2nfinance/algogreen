@@ -1,7 +1,6 @@
 from beaker import *
 from pyteal import *
 
-from beaker.lib.storage import BoxList, BoxMapping
 import proposal
 
 from beaker.consts import (
@@ -49,11 +48,6 @@ class DAOState:
             + (25000 + 3500)*15
             + (25000 + 25000)*3
         )
-
-        # self.new_loan_min_balance = Int(
-        #     100000 + 100000
-        #     + (25000 + 25000)*1
-        # )
 
 
 dao_app = Application(
@@ -296,9 +290,9 @@ def add_member(
 
 @Subroutine(TealType.uint64)
 def is_member(address: Expr) -> Expr:
-    assetbalance = AssetHolding.balance(address, dao_app.state.membership_token.get())
     return Seq(
-        assetbalance,
+        (member:= abi.Address()).set(address),
+        assetbalance:= AssetHolding.balance(member.get(), dao_app.state.membership_token.get()),
         Return(And(
             assetbalance.hasValue(),
             assetbalance.value() > Int(0)

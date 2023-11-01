@@ -160,7 +160,8 @@ def execute(quorum: abi.Uint64, passing_threshold: abi.Uint64, count_member: abi
         Assert(is_passed(quorum, passing_threshold, count_member) == Int(1)),
         Assert(proposal_app.state.owner.get() == proposer.get()),
         proposal_app.state.is_executed.set(Int(1)),
-        proposal_app.state.executed_at.set(Global.latest_timestamp())
+        proposal_app.state.executed_at.set(Global.latest_timestamp()),
+        output.set(Int(1))
     )
 
 @proposal_app.external(authorize=Authorize.only(proposal_app.state.dao_app_address.get()))
@@ -168,13 +169,15 @@ def repay(repay_amount: abi.Uint64, owner: abi.Address) -> Expr:
     return Seq(
         Assert(proposal_app.state.owner.get() == owner.get()),
         Assert(proposal_app.state.is_executed.get() == Int(1)),
+        Assert(proposal_app.state.is_repaid.get() == Int(0)),
         Assert(repay_amount.get() >= proposal_app.state.borrow_amount.get() * (Int(10000) + proposal_app.state.interest_rate.get()) / Int(10000) ),
-        # check time here, check allow repay
+        # check time contraints, check allowing repay
         If(proposal_app.state.allow_early_repay.get() == Int(0)).Then(
             Assert(Global.latest_timestamp() >= (proposal_app.state.executed_at.get() + proposal_app.state.term.get() * Int(30) * Int(24) * Int(3600)))
         ).Else(
             Assert(Global.latest_timestamp() >= proposal_app.state.executed_at.get())
-        )
+        ),
+        proposal_app.state.is_repaid.set(Int(1))
     )
 
 @proposal_app.external
