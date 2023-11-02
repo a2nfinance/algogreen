@@ -273,3 +273,11 @@ def withdraw(amount: abi.Uint64) -> Expr:
             }
         ),
     )
+
+
+if __name__ == "__main__":
+
+    mkp_app_spec = mkp_app.build()
+    print(mkp_app_spec.approval_program)
+    print(mkp_app_spec.clear_program)
+    print(mkp_app_spec.to_json())

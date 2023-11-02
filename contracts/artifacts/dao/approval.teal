@@ -1,0 +1,841 @@
+#pragma version 8
+intcblock 0 1 6 3
+bytecblock 0x6d656d626572736869705f746f6b656e 0x 0x151f7c75 0x636f756e745f6d656d626572 0x70617373696e675f7468726573686f6c64 0x71756f72756d 0x70726f706f73616c5f7375626d697373696f6e5f706f6c696379
+txna ApplicationArgs 0
+pushbytes 0x813a00b9 // "create(string,uint64,uint64,uint64)void"
+==
+bnz main_l20
+txna ApplicationArgs 0
+pushbytes 0x2201504e // "bootstrap(pay,string,uint64)uint64"
+==
+bnz main_l19
+txna ApplicationArgs 0
+pushbytes 0x04436af7 // "check_is_member(account)uint64"
+==
+bnz main_l18
+txna ApplicationArgs 0
+pushbytes 0x5a76f580 // "add_new_member(account)void"
+==
+bnz main_l17
+txna ApplicationArgs 0
+pushbytes 0xb017a106 // "add_members(address[])uint64"
+==
+bnz main_l16
+txna ApplicationArgs 0
+pushbytes 0x3a905ae8 // "create_proposal(pay,string,uint64,uint64,uint64,uint64,uint64,uint64,uint64)uint64"
+==
+bnz main_l15
+txna ApplicationArgs 0
+pushbytes 0x3ae5e251 // "vote(application,uint64)uint64"
+==
+bnz main_l14
+txna ApplicationArgs 0
+pushbytes 0x1eeea9eb // "execute_proposal(application,uint64,address)void"
+==
+bnz main_l13
+txna ApplicationArgs 0
+pushbytes 0xe7fa6b19 // "repay_proposal(pay,application)void"
+==
+bnz main_l12
+txna ApplicationArgs 0
+pushbytes 0x00931023 // "get_minimum_balance()uint64"
+==
+bnz main_l11
+err
+main_l11:
+txn OnCompletion
+intc_0 // NoOp
+==
+txn ApplicationID
+intc_0 // 0
+!=
+&&
+assert
+callsub getminimumbalancecaster_23
+intc_1 // 1
+return
+main_l12:
+txn OnCompletion
+intc_0 // NoOp
+==
+txn ApplicationID
+intc_0 // 0
+!=
+&&
+assert
+callsub repayproposalcaster_22
+intc_1 // 1
+return
+main_l13:
+txn OnCompletion
+intc_0 // NoOp
+==
+txn ApplicationID
+intc_0 // 0
+!=
+&&
+assert
+callsub executeproposalcaster_21
+intc_1 // 1
+return
+main_l14:
+txn OnCompletion
+intc_0 // NoOp
+==
+txn ApplicationID
+intc_0 // 0
+!=
+&&
+assert
+callsub votecaster_20
+intc_1 // 1
+return
+main_l15:
+txn OnCompletion
+intc_0 // NoOp
+==
+txn ApplicationID
+intc_0 // 0
+!=
+&&
+assert
+callsub createproposalcaster_19
+intc_1 // 1
+return
+main_l16:
+txn OnCompletion
+intc_0 // NoOp
+==
+txn ApplicationID
+intc_0 // 0
+!=
+&&
+assert
+callsub addmemberscaster_18
+intc_1 // 1
+return
+main_l17:
+txn OnCompletion
+intc_0 // NoOp
+==
+txn ApplicationID
+intc_0 // 0
+!=
+&&
+assert
+callsub addnewmembercaster_17
+intc_1 // 1
+return
+main_l18:
+txn OnCompletion
+intc_0 // NoOp
+==
+txn ApplicationID
+intc_0 // 0
+!=
+&&
+assert
+callsub checkismembercaster_16
+intc_1 // 1
+return
+main_l19:
+txn OnCompletion
+intc_0 // NoOp
+==
+txn ApplicationID
+intc_0 // 0
+!=
+&&
+assert
+callsub bootstrapcaster_15
+intc_1 // 1
+return
+main_l20:
+txn OnCompletion
+intc_0 // NoOp
+==
+txn ApplicationID
+intc_0 // 0
+==
+&&
+assert
+callsub createcaster_14
+intc_1 // 1
+return
+
+// create
+create_0:
+proto 4 0
+pushbytes 0x7469746c65 // "title"
+frame_dig -4
+extract 2 0
+app_global_put
+bytec 4 // "passing_threshold"
+frame_dig -3
+app_global_put
+bytec 5 // "quorum"
+frame_dig -2
+app_global_put
+bytec 6 // "proposal_submission_policy"
+frame_dig -1
+app_global_put
+retsub
+
+// bootstrap
+bootstrap_1:
+proto 3 1
+intc_0 // 0
+txn Sender
+global CreatorAddress
+==
+// unauthorized
+assert
+frame_dig -3
+gtxns Receiver
+global CurrentApplicationAddress
+==
+// payment must be to app address
+assert
+frame_dig -3
+gtxns Amount
+pushint 200000 // 200000
+>=
+// payment must be for >= 200000
+assert
+itxn_begin
+intc_3 // acfg
+itxn_field TypeEnum
+frame_dig -2
+extract 2 0
+itxn_field ConfigAssetName
+frame_dig -1
+itxn_field ConfigAssetTotal
+intc_1 // 1
+itxn_field ConfigAssetDefaultFrozen
+global CurrentApplicationAddress
+itxn_field ConfigAssetManager
+global CurrentApplicationAddress
+itxn_field ConfigAssetClawback
+global CurrentApplicationAddress
+itxn_field ConfigAssetFreeze
+global CurrentApplicationAddress
+itxn_field ConfigAssetReserve
+intc_0 // 0
+itxn_field Fee
+itxn_submit
+intc_0 // 0
+bytec_0 // "membership_token"
+app_global_get_ex
+store 1
+store 0
+load 1
+!
+assert
+bytec_0 // "membership_token"
+itxn CreatedAssetID
+app_global_put
+bytec_0 // "membership_token"
+app_global_get
+frame_bury 0
+retsub
+
+// check_is_member
+checkismember_2:
+proto 1 1
+intc_0 // 0
+frame_dig -1
+txnas Accounts
+callsub ismember_11
+intc_1 // 1
+==
+bnz checkismember_2_l2
+intc_0 // 0
+frame_bury 0
+b checkismember_2_l3
+checkismember_2_l2:
+intc_1 // 1
+frame_bury 0
+checkismember_2_l3:
+retsub
+
+// add_new_member
+addnewmember_3:
+proto 1 0
+txn Sender
+global CreatorAddress
+==
+// unauthorized
+assert
+frame_dig -1
+txnas Accounts
+callsub ismember_11
+intc_0 // 0
+==
+assert
+frame_dig -1
+txnas Accounts
+callsub sendasset_12
+frame_dig -1
+txnas Accounts
+intc_1 // 1
+callsub setassetfreeze_13
+bytec_3 // "count_member"
+bytec_3 // "count_member"
+app_global_get
+intc_1 // 1
++
+app_global_put
+retsub
+
+// add_members
+addmembers_4:
+proto 1 1
+intc_0 // 0
+bytec_1 // ""
+intc_0 // 0
+dupn 2
+txn Sender
+global CreatorAddress
+==
+// unauthorized
+assert
+intc_0 // 0
+store 4
+addmembers_4_l1:
+load 4
+frame_dig -1
+intc_0 // 0
+extract_uint16
+frame_bury 2
+frame_dig 2
+<
+bz addmembers_4_l3
+frame_dig -1
+pushint 32 // 32
+load 4
+*
+pushint 2 // 2
++
+pushint 32 // 32
+extract3
+frame_bury 1
+frame_dig 1
+callsub addmember_10
+load 4
+intc_1 // 1
++
+store 4
+b addmembers_4_l1
+addmembers_4_l3:
+frame_dig -1
+intc_0 // 0
+extract_uint16
+frame_bury 4
+frame_dig 4
+frame_bury 0
+retsub
+
+// create_proposal
+createproposal_5:
+proto 9 1
+intc_0 // 0
+bytec 6 // "proposal_submission_policy"
+app_global_get
+intc_0 // 0
+==
+bnz createproposal_5_l2
+intc_1 // 1
+intc_1 // 1
+==
+assert
+b createproposal_5_l3
+createproposal_5_l2:
+txn Sender
+callsub ismember_11
+intc_1 // 1
+==
+assert
+createproposal_5_l3:
+frame_dig -9
+gtxns Receiver
+global CurrentApplicationAddress
+==
+// payment must be to app address
+assert
+frame_dig -9
+gtxns Amount
+pushint 677500 // 677500
+>=
+// payment must be for >= 677500
+assert
+itxn_begin
+intc_2 // appl
+itxn_field TypeEnum
+pushbytes 0x0820040001904e6426100d61677265655f636f756e7465721064697361677265655f636f756e7465720b69735f65786563757465640f64616f5f6170705f6164647265737300056f776e657208656e645f74696d650d626f72726f775f616d6f756e740969735f7265706169640b65786563757465645f617404151f7c750a73746172745f74696d6515616c6c6f775f6561726c795f657865637574696f6e11616c6c6f775f6561726c795f72657061790d696e7465726573745f72617465047465726d361a008004812db1a012400071361a0080049828706912400055361a0080048722710912400039361a0080045fc5d55a1240001d361a0080043d53ca4a12400001003119221231182213104488028723433119221231182213104488025f2343311922123118221310448802142343311922123118221310448801eb23433119221231182212104488016e23438a0c0027058bf467800a64616f5f6170705f69648bf5c032672b8bf66780057469746c658bf757020067270b8bf86727068bf967270c8bfa67270d8bfb6727078bfc67270e8bfd67270f8bfe672822672922672a226727082267800964616f5f746f6b656e8bff67898a01012231002b6412443207270b640f4432072706640e442a642212448bff2212400009282864230867420006292964230867238c00898a05012231002b6412448bfd220d442707648bfe12442a64221244270c642212400005234442000732072706640f448bfb8bfc8bfd8800752312442705648bff12442a23672709320767238c00898a020031002b6412442705648bff12442a642312442708642212448bfe27076424270e64080b240a0f44270d64221240000a32072709640f444200153207270964270f64811e0b81180b81901c0b080f4427082367898a00012228648c00898a03018bfe2864250b28642964080a0e8bfd2864296408250b8bff0a0e10898a0000270422270449224707361a018c00361a0222558c01361a038c02361a048c03361a05178c04361a06178c05361a07178c06361a08178c07361a09178c08361a0a178c09361a0b178c0a361a0c178c0b8b008b018b028b038b048b058b068b078b088b098b0a8b0b88fe27898a00002249361a01178c018b0188fe7f8c00270a8b001650b0898a00002247042704361a01178c01361a02178c02361a03178c03361a04178c04361a058c058b018b028b038b048b0588fe7a8c00270a8b001650b0898a0000222704361a01178c00361a028c018b008b0188fea6898a00002288fef48c00270a8b001650b089 // 0x0820040001904e6426100d61677265655f636f756e7465721064697361677265655f636f756e7465720b69735f65786563757465640f64616f5f6170705f6164647265737300056f776e657208656e645f74696d650d626f72726f775f616d6f756e740969735f7265706169640b65786563757465645f617404151f7c750a73746172745f74696d6515616c6c6f775f6561726c795f657865637574696f6e11616c6c6f775f6561726c795f72657061790d696e7465726573745f72617465047465726d361a008004812db1a012400071361a0080049828706912400055361a0080048722710912400039361a0080045fc5d55a1240001d361a0080043d53ca4a12400001003119221231182213104488028723433119221231182213104488025f2343311922123118221310448802142343311922123118221310448801eb23433119221231182212104488016e23438a0c0027058bf467800a64616f5f6170705f69648bf5c032672b8bf66780057469746c658bf757020067270b8bf86727068bf967270c8bfa67270d8bfb6727078bfc67270e8bfd67270f8bfe672822672922672a226727082267800964616f5f746f6b656e8bff67898a01012231002b6412443207270b640f4432072706640e442a642212448bff2212400009282864230867420006292964230867238c00898a05012231002b6412448bfd220d442707648bfe12442a64221244270c642212400005234442000732072706640f448bfb8bfc8bfd8800752312442705648bff12442a23672709320767238c00898a020031002b6412442705648bff12442a642312442708642212448bfe27076424270e64080b240a0f44270d64221240000a32072709640f444200153207270964270f64811e0b81180b81901c0b080f4427082367898a00012228648c00898a03018bfe2864250b28642964080a0e8bfd2864296408250b8bff0a0e10898a0000270422270449224707361a018c00361a0222558c01361a038c02361a048c03361a05178c04361a06178c05361a07178c06361a08178c07361a09178c08361a0a178c09361a0b178c0a361a0c178c0b8b008b018b028b038b048b058b068b078b088b098b0a8b0b88fe27898a00002249361a01178c018b0188fe7f8c00270a8b001650b0898a00002247042704361a01178c01361a02178c02361a03178c03361a04178c04361a058c058b018b028b038b048b0588fe7a8c00270a8b001650b0898a0000222704361a01178c00361a028c018b008b0188fea6898a00002288fef48c00270a8b001650b089
+itxn_field ApprovalProgram
+pushbytes 0x08810043 // 0x08810043
+itxn_field ClearStateProgram
+intc_1 // 1
+itxn_field LocalNumUint
+intc_3 // 3
+itxn_field GlobalNumByteSlice
+pushint 14 // 14
+itxn_field GlobalNumUint
+pushbytes 0x812db1a0 // 0x812db1a0
+itxn_field ApplicationArgs
+txn Sender
+itxn_field ApplicationArgs
+global CurrentApplicationID
+itob
+itxn_field ApplicationArgs
+global CurrentApplicationAddress
+itxn_field ApplicationArgs
+frame_dig -8
+extract 2 0
+itxn_field ApplicationArgs
+frame_dig -7
+itob
+itxn_field ApplicationArgs
+frame_dig -6
+itob
+itxn_field ApplicationArgs
+frame_dig -5
+itob
+itxn_field ApplicationArgs
+frame_dig -4
+itob
+itxn_field ApplicationArgs
+frame_dig -3
+itob
+itxn_field ApplicationArgs
+frame_dig -2
+itob
+itxn_field ApplicationArgs
+frame_dig -1
+itob
+itxn_field ApplicationArgs
+bytec_0 // "membership_token"
+app_global_get
+itob
+itxn_field ApplicationArgs
+itxn_submit
+itxn CreatedApplicationID
+frame_bury 0
+retsub
+
+// vote
+vote_6:
+proto 2 1
+intc_0 // 0
+txn Sender
+callsub ismember_11
+intc_1 // 1
+==
+assert
+itxn_begin
+intc_2 // appl
+itxn_field TypeEnum
+frame_dig -2
+txnas Applications
+itxn_field ApplicationID
+pushbytes 0x98287069 // "vote(uint64)uint64"
+itxn_field ApplicationArgs
+frame_dig -1
+itob
+itxn_field ApplicationArgs
+itxn_submit
+frame_dig -1
+frame_bury 0
+retsub
+
+// execute_proposal
+executeproposal_7:
+proto 3 0
+global CurrentApplicationAddress
+balance
+frame_dig -2
+global CurrentApplicationAddress
+min_balance
++
+global MinTxnFee
++
+>=
+assert
+itxn_begin
+intc_2 // appl
+itxn_field TypeEnum
+frame_dig -3
+txnas Applications
+itxn_field ApplicationID
+pushbytes 0x87227109 // "execute(uint64,uint64,uint64,uint64,address)uint64"
+itxn_field ApplicationArgs
+bytec 5 // "quorum"
+app_global_get
+itob
+itxn_field ApplicationArgs
+bytec 4 // "passing_threshold"
+app_global_get
+itob
+itxn_field ApplicationArgs
+bytec_3 // "count_member"
+app_global_get
+itob
+itxn_field ApplicationArgs
+frame_dig -2
+itob
+itxn_field ApplicationArgs
+frame_dig -1
+itxn_field ApplicationArgs
+itxn_submit
+itxn_begin
+intc_1 // pay
+itxn_field TypeEnum
+frame_dig -1
+itxn_field Receiver
+frame_dig -2
+itxn_field Amount
+itxn_submit
+retsub
+
+// repay_proposal
+repayproposal_8:
+proto 2 0
+itxn_begin
+intc_2 // appl
+itxn_field TypeEnum
+frame_dig -1
+txnas Applications
+itxn_field ApplicationID
+pushbytes 0x5fc5d55a // "repay(uint64,address)void"
+itxn_field ApplicationArgs
+frame_dig -2
+gtxns Amount
+itob
+itxn_field ApplicationArgs
+txn Sender
+itxn_field ApplicationArgs
+itxn_submit
+retsub
+
+// get_minimum_balance
+getminimumbalance_9:
+proto 0 1
+intc_0 // 0
+global CurrentApplicationAddress
+min_balance
+frame_bury 0
+retsub
+
+// add_member
+addmember_10:
+proto 1 0
+frame_dig -1
+callsub ismember_11
+intc_0 // 0
+==
+assert
+frame_dig -1
+callsub sendasset_12
+frame_dig -1
+intc_1 // 1
+callsub setassetfreeze_13
+bytec_3 // "count_member"
+bytec_3 // "count_member"
+app_global_get
+intc_1 // 1
++
+app_global_put
+retsub
+
+// is_member
+ismember_11:
+proto 1 1
+frame_dig -1
+bytec_0 // "membership_token"
+app_global_get
+asset_holding_get AssetBalance
+store 3
+store 2
+load 3
+load 2
+intc_0 // 0
+>
+&&
+retsub
+
+// send_asset
+sendasset_12:
+proto 1 0
+itxn_begin
+pushint 4 // axfer
+itxn_field TypeEnum
+bytec_0 // "membership_token"
+app_global_get
+itxn_field XferAsset
+intc_1 // 1
+itxn_field AssetAmount
+frame_dig -1
+itxn_field AssetReceiver
+global CurrentApplicationAddress
+itxn_field AssetSender
+itxn_submit
+retsub
+
+// set_asset_freeze
+setassetfreeze_13:
+proto 2 0
+itxn_begin
+pushint 5 // afrz
+itxn_field TypeEnum
+frame_dig -2
+itxn_field FreezeAssetAccount
+frame_dig -1
+itxn_field FreezeAssetFrozen
+bytec_0 // "membership_token"
+app_global_get
+itxn_field FreezeAsset
+itxn_submit
+retsub
+
+// create_caster
+createcaster_14:
+proto 0 0
+bytec_1 // ""
+intc_0 // 0
+dupn 2
+txna ApplicationArgs 1
+frame_bury 0
+txna ApplicationArgs 2
+btoi
+frame_bury 1
+txna ApplicationArgs 3
+btoi
+frame_bury 2
+txna ApplicationArgs 4
+btoi
+frame_bury 3
+frame_dig 0
+frame_dig 1
+frame_dig 2
+frame_dig 3
+callsub create_0
+retsub
+
+// bootstrap_caster
+bootstrapcaster_15:
+proto 0 0
+intc_0 // 0
+dup
+bytec_1 // ""
+intc_0 // 0
+txna ApplicationArgs 1
+frame_bury 2
+txna ApplicationArgs 2
+btoi
+frame_bury 3
+txn GroupIndex
+intc_1 // 1
+-
+frame_bury 1
+frame_dig 1
+gtxns TypeEnum
+intc_1 // pay
+==
+assert
+frame_dig 1
+frame_dig 2
+frame_dig 3
+callsub bootstrap_1
+frame_bury 0
+bytec_2 // 0x151f7c75
+frame_dig 0
+itob
+concat
+log
+retsub
+
+// check_is_member_caster
+checkismembercaster_16:
+proto 0 0
+intc_0 // 0
+dup
+txna ApplicationArgs 1
+intc_0 // 0
+getbyte
+frame_bury 1
+frame_dig 1
+callsub checkismember_2
+frame_bury 0
+bytec_2 // 0x151f7c75
+frame_dig 0
+itob
+concat
+log
+retsub
+
+// add_new_member_caster
+addnewmembercaster_17:
+proto 0 0
+intc_0 // 0
+txna ApplicationArgs 1
+intc_0 // 0
+getbyte
+frame_bury 0
+frame_dig 0
+callsub addnewmember_3
+retsub
+
+// add_members_caster
+addmemberscaster_18:
+proto 0 0
+intc_0 // 0
+bytec_1 // ""
+txna ApplicationArgs 1
+frame_bury 1
+frame_dig 1
+callsub addmembers_4
+frame_bury 0
+bytec_2 // 0x151f7c75
+frame_dig 0
+itob
+concat
+log
+retsub
+
+// create_proposal_caster
+createproposalcaster_19:
+proto 0 0
+intc_0 // 0
+dup
+bytec_1 // ""
+intc_0 // 0
+dupn 6
+txna ApplicationArgs 1
+frame_bury 2
+txna ApplicationArgs 2
+btoi
+frame_bury 3
+txna ApplicationArgs 3
+btoi
+frame_bury 4
+txna ApplicationArgs 4
+btoi
+frame_bury 5
+txna ApplicationArgs 5
+btoi
+frame_bury 6
+txna ApplicationArgs 6
+btoi
+frame_bury 7
+txna ApplicationArgs 7
+btoi
+frame_bury 8
+txna ApplicationArgs 8
+btoi
+frame_bury 9
+txn GroupIndex
+intc_1 // 1
+-
+frame_bury 1
+frame_dig 1
+gtxns TypeEnum
+intc_1 // pay
+==
+assert
+frame_dig 1
+frame_dig 2
+frame_dig 3
+frame_dig 4
+frame_dig 5
+frame_dig 6
+frame_dig 7
+frame_dig 8
+frame_dig 9
+callsub createproposal_5
+frame_bury 0
+bytec_2 // 0x151f7c75
+frame_dig 0
+itob
+concat
+log
+retsub
+
+// vote_caster
+votecaster_20:
+proto 0 0
+intc_0 // 0
+dupn 2
+txna ApplicationArgs 1
+intc_0 // 0
+getbyte
+frame_bury 1
+txna ApplicationArgs 2
+btoi
+frame_bury 2
+frame_dig 1
+frame_dig 2
+callsub vote_6
+frame_bury 0
+bytec_2 // 0x151f7c75
+frame_dig 0
+itob
+concat
+log
+retsub
+
+// execute_proposal_caster
+executeproposalcaster_21:
+proto 0 0
+intc_0 // 0
+dup
+bytec_1 // ""
+txna ApplicationArgs 1
+intc_0 // 0
+getbyte
+frame_bury 0
+txna ApplicationArgs 2
+btoi
+frame_bury 1
+txna ApplicationArgs 3
+frame_bury 2
+frame_dig 0
+frame_dig 1
+frame_dig 2
+callsub executeproposal_7
+retsub
+
+// repay_proposal_caster
+repayproposalcaster_22:
+proto 0 0
+intc_0 // 0
+dup
+txna ApplicationArgs 1
+intc_0 // 0
+getbyte
+frame_bury 1
+txn GroupIndex
+intc_1 // 1
+-
+frame_bury 0
+frame_dig 0
+gtxns TypeEnum
+intc_1 // pay
+==
+assert
+frame_dig 0
+frame_dig 1
+callsub repayproposal_8
+retsub
+
+// get_minimum_balance_caster
+getminimumbalancecaster_23:
+proto 0 0
+intc_0 // 0
+callsub getminimumbalance_9
+frame_bury 0
+bytec_2 // 0x151f7c75
+frame_dig 0
+itob
+concat
+log
+retsub

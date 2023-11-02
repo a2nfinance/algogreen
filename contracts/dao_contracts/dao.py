@@ -1,7 +1,7 @@
 from beaker import *
 from pyteal import *
 
-import proposal
+from dao_contracts import proposal
 
 from beaker.consts import (
     ASSET_MIN_BALANCE
