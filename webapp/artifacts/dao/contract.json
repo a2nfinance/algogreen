@@ -1,0 +1,190 @@
+{
+    "name": "CustomDAO",
+    "methods": [
+        {
+            "name": "create",
+            "args": [
+                {
+                    "type": "string",
+                    "name": "title"
+                },
+                {
+                    "type": "uint64",
+                    "name": "passing_threshold"
+                },
+                {
+                    "type": "uint64",
+                    "name": "quorum"
+                },
+                {
+                    "type": "uint64",
+                    "name": "proposal_submission_policy"
+                }
+            ],
+            "returns": {
+                "type": "void"
+            }
+        },
+        {
+            "name": "bootstrap",
+            "args": [
+                {
+                    "type": "pay",
+                    "name": "seed"
+                },
+                {
+                    "type": "string",
+                    "name": "token_name"
+                },
+                {
+                    "type": "uint64",
+                    "name": "token_supply"
+                }
+            ],
+            "returns": {
+                "type": "uint64"
+            },
+            "desc": "create membership token and receive initial seed payment"
+        },
+        {
+            "name": "check_is_member",
+            "args": [
+                {
+                    "type": "account",
+                    "name": "address"
+                }
+            ],
+            "returns": {
+                "type": "uint64"
+            }
+        },
+        {
+            "name": "add_new_member",
+            "args": [
+                {
+                    "type": "account",
+                    "name": "new_member"
+                }
+            ],
+            "returns": {
+                "type": "void"
+            }
+        },
+        {
+            "name": "add_members",
+            "args": [
+                {
+                    "type": "address[]",
+                    "name": "new_members"
+                }
+            ],
+            "returns": {
+                "type": "uint64"
+            }
+        },
+        {
+            "name": "create_proposal",
+            "args": [
+                {
+                    "type": "pay",
+                    "name": "seed"
+                },
+                {
+                    "type": "string",
+                    "name": "title"
+                },
+                {
+                    "type": "uint64",
+                    "name": "start_time"
+                },
+                {
+                    "type": "uint64",
+                    "name": "end_time"
+                },
+                {
+                    "type": "uint64",
+                    "name": "allow_early_execution"
+                },
+                {
+                    "type": "uint64",
+                    "name": "allow_early_repay"
+                },
+                {
+                    "type": "uint64",
+                    "name": "borrow_amount"
+                },
+                {
+                    "type": "uint64",
+                    "name": "interest_rate"
+                },
+                {
+                    "type": "uint64",
+                    "name": "term"
+                }
+            ],
+            "returns": {
+                "type": "uint64"
+            }
+        },
+        {
+            "name": "vote",
+            "args": [
+                {
+                    "type": "application",
+                    "name": "proposal_app_id"
+                },
+                {
+                    "type": "uint64",
+                    "name": "agree"
+                }
+            ],
+            "returns": {
+                "type": "uint64"
+            }
+        },
+        {
+            "name": "execute_proposal",
+            "args": [
+                {
+                    "type": "application",
+                    "name": "proposal_app_id"
+                },
+                {
+                    "type": "uint64",
+                    "name": "borrow_amount"
+                },
+                {
+                    "type": "address",
+                    "name": "proposer"
+                }
+            ],
+            "returns": {
+                "type": "void"
+            }
+        },
+        {
+            "name": "repay_proposal",
+            "args": [
+                {
+                    "type": "pay",
+                    "name": "repay_txn"
+                },
+                {
+                    "type": "application",
+                    "name": "proposal_app_id"
+                }
+            ],
+            "returns": {
+                "type": "void"
+            }
+        },
+        {
+            "name": "get_minimum_balance",
+            "args": [],
+            "returns": {
+                "type": "uint64"
+            }
+        }
+    ],
+    "networks": {}
+}

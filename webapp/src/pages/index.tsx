@@ -4,6 +4,8 @@ import { useEffect } from "react";
 
 import { Typography } from 'antd';
 import { useRouter } from "next/router";
+import { ConnectMenu } from "src/components/common/ConnectMenu";
+import { TestCore } from "src/components/common/TestCore";
 // import { FeaturedProjects } from "src/components/project/FeaturedProjects";
 // import { List } from "src/components/credit/List";
 // import { FeatureImageSlides } from "src/components/home/FeatureImageSlides";
@@ -78,7 +80,8 @@ export default function Index() {
 {/* 
             <FeaturedProjects />
             <List /> */}
-
+            <TestCore />
+            <ConnectMenu />
         </div>
     )
 }

@@ -18,6 +18,7 @@ import { Button, Form, Image, Layout, Menu, Space, theme } from 'antd';
 import { useRouter } from 'next/router';
 
 import React, { useState } from "react";
+import { ConnectButton } from './common/ConnectButton';
 // import AutoSearch from './common/AutoSearch';
 // import { ConnectButton } from './common/ConnectButton';
 const { Header, Sider, Content, Footer } = Layout;
@@ -189,7 +190,7 @@ export const LayoutProvider = (props: Props) => {
                                 {/* <AutoSearch /> */}
                             </Form.Item>
                             <Form.Item>
-                                {/* <ConnectButton /> */}
+                                <ConnectButton />
                             </Form.Item>
                         </Form>
                     </Space>
