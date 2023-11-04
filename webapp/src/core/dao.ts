@@ -1,10 +1,14 @@
 import algosdk, { ABIAddressType, ABIArrayDynamicType, ABIContract, ABIReferenceType, ABIStringType, ABIType } from "algosdk";
 import { algoClient, waitRoundsToConfirm } from "./constant";
 import * as abi from '../../artifacts/dao/contract.json';
+import * as proposalAbi from '../../artifacts/proposal/contract.json';
 import moment from "moment";
 // @ts-ignore
 const contract = new algosdk.ABIContract(abi);
-
+const proposalContract = new algosdk.ABIContract(proposalAbi);
+const appId = 468059037
+const tokenId = 468060065;
+const proposalId = 468067344;
 
 export const checkAccountInfo = async (address: string) => {
 
@@ -13,6 +17,31 @@ export const checkAccountInfo = async (address: string) => {
 
 }
 
+export const fundDAO = async(
+    address: string, 
+    amount: number,
+    signTransactions: Function,
+    sendTransactions: Function
+    ) => {
+    try {
+        const appAddress = algosdk.getApplicationAddress(appId);
+        const suggestedParams = await algoClient.getTransactionParams().do();
+        const fundTxn = algosdk.makePaymentTxnWithSuggestedParamsFromObject({
+            from: address,
+            to: appAddress,
+            amount: amount,
+            suggestedParams,
+            note: (new ABIStringType()).encode("Fund DAO smart contracts")
+        });
+
+        const encodedFundTransaction = algosdk.encodeUnsignedTransaction(fundTxn)
+        const signedTransactions = await signTransactions([encodedFundTransaction])
+        const { id, txId, txn } = await sendTransactions(signedTransactions, waitRoundsToConfirm);
+        console.log('Successfully sent transaction. Transaction ID: ', txId)
+    } catch(e) {
+        console.log(e)
+    }
+}
 export const deployDAO = async (
     address: string,
     signTransactions: Function,
@@ -73,8 +102,6 @@ export const bootstrapDAO = async (
     sendTransactions: Function
 ) => {
     try {
-        // Test dao app id: 467474647
-        const appId = 467479601;
         const appAddress = algosdk.getApplicationAddress(appId);
         const suggestedParams = await algoClient.getTransactionParams().do();
         const fundTxn = algosdk.makePaymentTxnWithSuggestedParamsFromObject({
@@ -83,6 +110,7 @@ export const bootstrapDAO = async (
             amount: 200_000, // 0.2 ALGO,
             // Double the fee so newAccount doesn't need to pay a fee
             suggestedParams: { ...suggestedParams, fee: 2 * algosdk.ALGORAND_MIN_TX_FEE, flatFee: true },
+            note: (new ABIStringType()).encode("Init smart contract balance for storage and transactions")
         });
         const bootstrapMethodSelector = algosdk.getMethodByName(contract.methods, 'bootstrap').getSelector();
 
@@ -105,8 +133,8 @@ export const bootstrapDAO = async (
         const encodedBootstrapTransaction = algosdk.encodeUnsignedTransaction(bootstrapAddTxn)
         const signedTransactions = await signTransactions([encodedFundTransaction, encodedBootstrapTransaction])
         const { id, txId, txn } = await sendTransactions(signedTransactions, waitRoundsToConfirm);
-        const tokenId = await getTokenId(appId);
-        console.log("Membership token id:", tokenId)
+        const createdTokenId = await getTokenId(appId);
+        console.log("Membership token id:", createdTokenId)
         console.log('Successfully sent transaction. Transaction ID: ', txId)
     } catch (e) {
         console.log(e)
@@ -116,13 +144,13 @@ export const bootstrapDAO = async (
 export const getTokenId = async (appId: number) => {
     const appInfo = await algoClient.getApplicationByID(appId).do()
     let globalState: { key: string, value: any }[] = appInfo.params["global-state"];
-    let tokenId = "";
+    let createdTokenId = "";
     globalState.forEach(state => {
         if (state.key === btoa("membership_token")) {
-            tokenId = state.value.uint
+            createdTokenId = state.value.uint
         }
     })
-    return tokenId;
+    return createdTokenId;
 }
 
 export const getTxnInfo = async (txnId: string) => {
@@ -140,7 +168,6 @@ export const optAccountIntoAsset = async (
     signTransactions: Function,
     sendTransactions: Function
 ) => {
-    const tokenId = 467479754;
     const suggestedParams = await algoClient.getTransactionParams().do();
     const optinTxn = algosdk.makeAssetTransferTxnWithSuggestedParamsFromObject({
         from: address,
@@ -155,6 +182,7 @@ export const optAccountIntoAsset = async (
     const { id, txId, txn } = await sendTransactions(signedTransactions, waitRoundsToConfirm);
     console.log('Successfully sent transaction. Transaction ID: ', txId)
 }
+
 export const addMembers = async (
     address: string,
     members: string[],
@@ -162,8 +190,6 @@ export const addMembers = async (
     sendTransactions: Function
 ) => {
     try {
-        const appId = 467479601;
-        const tokenId = 467479754;
         const suggestedParams = await algoClient.getTransactionParams().do();
         const appAddress = algosdk.getApplicationAddress(appId);
         const fundTxn = algosdk.makePaymentTxnWithSuggestedParamsFromObject({
@@ -198,7 +224,6 @@ export const addMembers = async (
         const signedTransactions = await signTransactions([encodedFundTransaction, encodedAddMembersTransaction])
         const { id, txId, txn } = await sendTransactions(signedTransactions, waitRoundsToConfirm);
         console.log('Successfully sent transaction. Transaction ID: ', txId)
-        console.log("")
     } catch (e) {
         console.log(e)
     }
@@ -211,8 +236,6 @@ export const createProposal = async (
     sendTransactions: Function
 ) => {
     try {
-        const appId = 467479601;
-        const tokenId = 467479754;
         const minimumFund = 100000 +
             + (25000 + 3500) * 15
             + (25000 + 25000) * 3
@@ -237,7 +260,7 @@ export const createProposal = async (
                 createProposalMethodSelector,
                 (new ABIStringType()).encode("New proposal"),
                 algosdk.encodeUint64(now),
-                algosdk.encodeUint64(now + 1000),
+                algosdk.encodeUint64(now + 100000),
                 algosdk.encodeUint64(1),
                 algosdk.encodeUint64(1),
                 algosdk.encodeUint64(500_000),
@@ -262,15 +285,35 @@ export const createProposal = async (
     }
 }
 
+export const optAccountIntoApp = async (
+    address: string,
+    signTransactions: Function,
+    sendTransactions: Function
+) => {
+    const suggestedParams = await algoClient.getTransactionParams().do();
+    const optinProposalMethodSelector = algosdk.getMethodByName(proposalContract.methods, 'opt_in').getSelector();
+    const optinTxn = algosdk.makeApplicationOptInTxnFromObject(
+        { 
+            from: address,
+            suggestedParams,
+            appIndex: proposalId,
+            appArgs:[optinProposalMethodSelector]
+        }
+    )
+
+    const encodedOptinTransaction = algosdk.encodeUnsignedTransaction(optinTxn);
+    const signedTransactions = await signTransactions([encodedOptinTransaction])
+    const { id, txId, txn } = await sendTransactions(signedTransactions, waitRoundsToConfirm);
+    console.log('Successfully sent transaction. Transaction ID: ', txId)
+}
+
+
 export const vote = async (
     address: string,
     agree: number,
     signTransactions: Function,
     sendTransactions: Function
 ) => {
-
-    const proposalId = 467647794
-    const appId = 467479601
     // If use local state to check a member voted or not yet, need to a opt-in transaction
     const suggestedParams = await algoClient.getTransactionParams().do();
     const voteMethodSelector = algosdk.getMethodByName(contract.methods, 'vote').getSelector();
@@ -284,7 +327,8 @@ export const vote = async (
             algosdk.encodeUint64(proposalId),
             algosdk.encodeUint64(agree)
         ],
-        foreignApps: [proposalId]
+        foreignApps: [proposalId],
+        foreignAssets: [tokenId]
     });
 
     const encodedVoteTransaction = algosdk.encodeUnsignedTransaction(voteTxn)
@@ -295,11 +339,10 @@ export const vote = async (
 
 export const executeProposal = async (
     address: string,
+    proposalAddress: string,
     signTransactions: Function,
     sendTransactions: Function
 ) => {
-    const proposalId = 467647794
-    const appId = 467479601
     // If use local state to check a member voted or not yet, need to a opt-in transaction
     const suggestedParams = await algoClient.getTransactionParams().do();
     const executeProposalMethodSelector = algosdk.getMethodByName(contract.methods, 'execute_proposal').getSelector();
@@ -311,8 +354,11 @@ export const executeProposal = async (
         appArgs: [
             executeProposalMethodSelector,
             algosdk.encodeUint64(proposalId),
+            algosdk.encodeUint64(500_000),
+            (new ABIAddressType()).encode(proposalAddress)
         ],
-        foreignApps: [proposalId]
+        foreignApps: [proposalId],
+        accounts:[address]
     });
 
     const encodedExecuteTransaction = algosdk.encodeUnsignedTransaction(executeProposalTxn)
@@ -322,12 +368,10 @@ export const executeProposal = async (
 }
 
 export const repayProposal = async (
-    address: string, 
+    address: string,
     signTransactions: Function,
     sendTransactions: Function
 ) => {
-    const proposalId = 467647794
-    const appId = 467479601
     const appAddress = algosdk.getApplicationAddress(appId);
     const suggestedParams = await algoClient.getTransactionParams().do();
 
@@ -339,23 +383,23 @@ export const repayProposal = async (
         note: (new ABIStringType()).encode("Repay Transaction"),
     });
 
-    const executeProposalMethodSelector = algosdk.getMethodByName(contract.methods, 'repay_proposal').getSelector();
-    const executeProposalTxn = algosdk.makeApplicationCallTxnFromObject({
+    const repayProposalMethodSelector = algosdk.getMethodByName(contract.methods, 'repay_proposal').getSelector();
+    const repayProposalTxn = algosdk.makeApplicationCallTxnFromObject({
         from: address,
         suggestedParams: suggestedParams,
         appIndex: appId,
         onComplete: algosdk.OnApplicationComplete.NoOpOC,
         appArgs: [
-            executeProposalMethodSelector,
+            repayProposalMethodSelector,
             algosdk.encodeUint64(proposalId),
         ],
         foreignApps: [proposalId]
     });
-    let txnArray = [repayTxn, executeProposalTxn];
+    let txnArray = [repayTxn, repayProposalTxn];
     let groupID = algosdk.computeGroupID(txnArray);
     for (let i = 0; i < 2; i++) txnArray[i].group = groupID;
 
-    const encodedExecuteTransaction = algosdk.encodeUnsignedTransaction(executeProposalTxn)
+    const encodedExecuteTransaction = algosdk.encodeUnsignedTransaction(repayProposalTxn)
     const signedTransactions = await signTransactions([encodedExecuteTransaction])
     const { id, txId, txn } = await sendTransactions(signedTransactions, waitRoundsToConfirm);
     console.log('Successfully sent transaction. Transaction ID: ', txId)

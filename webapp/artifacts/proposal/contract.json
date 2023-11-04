@@ -1,0 +1,136 @@
+{
+    "name": "ProposalContract",
+    "methods": [
+        {
+            "name": "create",
+            "args": [
+                {
+                    "type": "address",
+                    "name": "owner"
+                },
+                {
+                    "type": "uint64",
+                    "name": "dao_app_id"
+                },
+                {
+                    "type": "address",
+                    "name": "dao_app_address"
+                },
+                {
+                    "type": "string",
+                    "name": "title"
+                },
+                {
+                    "type": "uint64",
+                    "name": "start_time"
+                },
+                {
+                    "type": "uint64",
+                    "name": "end_time"
+                },
+                {
+                    "type": "uint64",
+                    "name": "allow_early_execution"
+                },
+                {
+                    "type": "uint64",
+                    "name": "allow_early_repay"
+                },
+                {
+                    "type": "uint64",
+                    "name": "borrow_amount"
+                },
+                {
+                    "type": "uint64",
+                    "name": "interest_rate"
+                },
+                {
+                    "type": "uint64",
+                    "name": "term"
+                },
+                {
+                    "type": "uint64",
+                    "name": "dao_token"
+                }
+            ],
+            "returns": {
+                "type": "void"
+            }
+        },
+        {
+            "name": "opt_in",
+            "args": [],
+            "returns": {
+                "type": "void"
+            }
+        },
+        {
+            "name": "vote",
+            "args": [
+                {
+                    "type": "account",
+                    "name": "voter"
+                },
+                {
+                    "type": "uint64",
+                    "name": "agree"
+                }
+            ],
+            "returns": {
+                "type": "uint64"
+            }
+        },
+        {
+            "name": "execute",
+            "args": [
+                {
+                    "type": "uint64",
+                    "name": "quorum"
+                },
+                {
+                    "type": "uint64",
+                    "name": "passing_threshold"
+                },
+                {
+                    "type": "uint64",
+                    "name": "count_member"
+                },
+                {
+                    "type": "uint64",
+                    "name": "borrow_amount"
+                },
+                {
+                    "type": "address",
+                    "name": "proposer"
+                }
+            ],
+            "returns": {
+                "type": "uint64"
+            }
+        },
+        {
+            "name": "repay",
+            "args": [
+                {
+                    "type": "uint64",
+                    "name": "repay_amount"
+                },
+                {
+                    "type": "address",
+                    "name": "owner"
+                }
+            ],
+            "returns": {
+                "type": "void"
+            }
+        },
+        {
+            "name": "get_aggree_counter",
+            "args": [],
+            "returns": {
+                "type": "uint64"
+            }
+        }
+    ],
+    "networks": {}
+}

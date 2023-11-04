@@ -130,7 +130,7 @@
             "name": "vote",
             "args": [
                 {
-                    "type": "application",
+                    "type": "uint64",
                     "name": "proposal_app_id"
                 },
                 {
@@ -146,7 +146,7 @@
             "name": "execute_proposal",
             "args": [
                 {
-                    "type": "application",
+                    "type": "uint64",
                     "name": "proposal_app_id"
                 },
                 {
@@ -170,7 +170,7 @@
                     "name": "repay_txn"
                 },
                 {
-                    "type": "application",
+                    "type": "uint64",
                     "name": "proposal_app_id"
                 }
             ],
@@ -181,6 +181,18 @@
         {
             "name": "get_minimum_balance",
             "args": [],
+            "returns": {
+                "type": "uint64"
+            }
+        },
+        {
+            "name": "withdraw",
+            "args": [
+                {
+                    "type": "uint64",
+                    "name": "amount"
+                }
+            ],
             "returns": {
                 "type": "uint64"
             }
