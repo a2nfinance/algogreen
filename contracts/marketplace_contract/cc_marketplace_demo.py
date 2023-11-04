@@ -63,6 +63,8 @@ mkp_app_client = client.ApplicationClient(
 sp = mkp_app_client.get_suggested_params()
 sp.flat_fee = True
 sp.fee = 2000
+
+print("Minimum balance:", mkp_app.state.minimum_balance.value)
 ptxn = PaymentTxn(
         acct1.address,
         sp,

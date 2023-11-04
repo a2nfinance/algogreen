@@ -37,8 +37,6 @@ dao_app_client = client.ApplicationClient(
     signer=sender.signer
 )
 
-
-
 dao_app_id, dao_addr, _ = dao_app_client.create(title="Test DAO", passing_threshold=20, quorum=50, proposal_submission_policy=1)
 
 print("Created dao app id: ", dao_app_id)
