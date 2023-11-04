@@ -1,7 +1,7 @@
 from beaker import *
 from pyteal import *
 
-from dao_contracts import proposal
+import proposal
 
 from beaker.consts import (
     ASSET_MIN_BALANCE
@@ -199,19 +199,23 @@ def create_proposal(
 
 @dao_app.external
 def vote(
-    proposal_app_id: abi.Application, 
+    proposal_app_id: abi.Uint64, 
     agree: abi.Uint64,
     *,
     output: abi.Uint64
     ) -> Expr:
+    sender = Txn.sender()
     return Seq(
         # Check member
-        Assert(is_member(Txn.sender()) == Int(1)),
+        Assert(is_member(sender) == Int(1)),
         InnerTxnBuilder.Begin(),
         InnerTxnBuilder.MethodCall(
-            app_id=proposal_app_id.application_id(),
+            app_id=proposal_app_id.get(),
             method_signature=proposal.vote.method_signature(),
-            args=[agree],
+            args=[
+                sender,
+                agree
+            ],
         ),
         InnerTxnBuilder.Submit(),
         output.set(agree)
@@ -219,7 +223,7 @@ def vote(
 
 @dao_app.external
 def execute_proposal(
-    proposal_app_id: abi.Application, 
+    proposal_app_id: abi.Uint64, 
     borrow_amount: abi.Uint64,
     proposer: abi.Address
     ) -> Expr:
@@ -227,7 +231,7 @@ def execute_proposal(
         Assert(Balance(Global.current_application_address()) >= borrow_amount.get() + MinBalance(Global.current_application_address()) + Global.min_txn_fee()),
         InnerTxnBuilder.Begin(),
         InnerTxnBuilder.MethodCall(
-            app_id=proposal_app_id.application_id(),
+            app_id=proposal_app_id.get(),
             method_signature=proposal.execute.method_signature(),
             args=[
                 Itob(dao_app.state.quorum.get()), 
@@ -250,12 +254,12 @@ def execute_proposal(
 @dao_app.external
 def repay_proposal(
     repay_txn: abi.PaymentTransaction,
-    proposal_app_id: abi.Application
+    proposal_app_id: abi.Uint64
     ) -> Expr:
     return Seq(
         InnerTxnBuilder.Begin(),
         InnerTxnBuilder.MethodCall(
-            app_id=proposal_app_id.application_id(),
+            app_id=proposal_app_id.get(),
             method_signature=proposal.repay.method_signature(),
             args=[
                 Itob(repay_txn.get().amount()),
@@ -269,6 +273,20 @@ def repay_proposal(
 def get_minimum_balance(*, output: abi.Uint64) -> Expr:
     return output.set(MinBalance(Global.current_application_address()))
 
+@dao_app.external(authorize=Authorize.only_creator())
+def withdraw(amount: abi.Uint64, *, output: abi.Uint64) -> Expr:
+    balance= Balance(Global.current_application_address())
+    return Seq(
+        Assert(balance >= amount.get() + MinBalance(Global.current_application_address()) + Global.min_txn_fee()),
+        InnerTxnBuilder.Execute(
+            {
+                TxnField.type_enum: TxnType.Payment,
+                TxnField.receiver: Global.creator_address(),
+                TxnField.amount: amount.get(),
+            }
+        ),
+        output.set(amount.get())
+    )
 
 ## Subroutines
 

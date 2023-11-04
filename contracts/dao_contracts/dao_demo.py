@@ -1,5 +1,5 @@
 from beaker import client, localnet, consts
-from algosdk.transaction import PaymentTxn, AssetOptInTxn
+from algosdk.transaction import PaymentTxn, AssetOptInTxn, ApplicationOptInTxn, wait_for_confirmation
 from algosdk.atomic_transaction_composer import TransactionWithSigner
 from algosdk.encoding import decode_address, encode_address
 import time
@@ -19,6 +19,7 @@ from dao import (
 from proposal import (
     proposal_app,
     get_aggree_counter,
+    opt_in
     # vote
 )
 
@@ -123,11 +124,7 @@ min_balance_req = dao_app_client.call(get_minimum_balance)
 min_balance = min_balance_req.return_value
 
 print("Minimum balance after proposal creation:", min_balance)
-
-dao_app_client.call(vote, proposal_app_id=proposal_app_id, agree=1,  foreign_assets=[membership_token])
-
 # 5. Voting
-
 proposal_app_client = client.ApplicationClient(
     client=localnet.get_algod_client(),
     app=proposal_app,
@@ -135,6 +132,20 @@ proposal_app_client = client.ApplicationClient(
     signer=member.signer
 )
 
+txid = dao_app_client.client.send_transaction(
+    ApplicationOptInTxn(sender.address, sp, proposal_app_id, app_args=[opt_in.method_spec().get_selector()]).sign(
+        sender.private_key
+    )
+)   
+optin_result = wait_for_confirmation(proposal_app_client.client, txid, 4)
+assert optin_result["confirmed-round"] > 0
+print("Opted account into proposal app:", proposal_app_id)
+
+print("Before vote:", sender.address)
+
+dao_app_client.call(vote, proposal_app_id=proposal_app_id, agree=1, foreign_apps=[proposal_app_id], foreign_assets=[membership_token])
+
+print("Voted by:", sender.address)
 get_agree_after_voting = proposal_app_client.call(get_aggree_counter)
 
 print("Number of agreements after voting: ", get_agree_after_voting.return_value)
@@ -154,7 +165,8 @@ execute_and_create_loan = dao_app_client.call(
     proposal_app_id=proposal_app_id,
     borrow_amount= 1* consts.algo,
     proposer=proposer.address,
-    accounts=[proposer.address]
+    accounts=[proposer.address],
+    foreign_apps=[proposal_app_id]
 )
 
 print("DAO app account Algo - After: ", dao_app_client.get_application_account_info().get("amount"))
@@ -167,4 +179,4 @@ ptxn = PaymentTxn(
         int(1.09 * consts.algo),
 )
 
-result2 = dao_app_client_proposer.call(repay_proposal, repay_txn=TransactionWithSigner(ptxn, proposer.signer), proposal_app_id=proposal_app_id)
+result2 = dao_app_client_proposer.call(repay_proposal, repay_txn=TransactionWithSigner(ptxn, proposer.signer), proposal_app_id=proposal_app_id, foreign_apps=[proposal_app_id])

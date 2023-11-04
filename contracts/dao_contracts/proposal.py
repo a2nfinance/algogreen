@@ -101,7 +101,7 @@ proposal_app = Application(
 @proposal_app.create
 def create(
     owner: abi.Address,
-    dao_app_id: abi.Application, 
+    dao_app_id: abi.Uint64, 
     dao_app_address: abi.Address,
     title: abi.String, 
     start_time: abi.Uint64,
@@ -115,7 +115,7 @@ def create(
     ) -> Expr:
     return Seq(
         proposal_app.state.owner.set(owner.get()),
-        proposal_app.state.dao_app_id.set(dao_app_id.application_id()),
+        proposal_app.state.dao_app_id.set(dao_app_id.get()),
         proposal_app.state.dao_app_address.set(dao_app_address.get()),
         proposal_app.state.title.set(title.get()),
         proposal_app.state.start_time.set(start_time.get()),
@@ -132,17 +132,25 @@ def create(
         proposal_app.state.dao_token.set(dao_token.get())
     )
 
+@proposal_app.opt_in
+def opt_in() -> Expr:
+    return Seq(
+        
+    )
 
 @proposal_app.external(authorize= Authorize.only(proposal_app.state.dao_app_address.get()))
-def vote(agree: abi.Uint64, *, output: abi.Uint64) -> Expr:
+def vote(voter: abi.Account, agree: abi.Uint64, *, output: abi.Uint64) -> Expr:
     return Seq(
+        Assert(proposal_app.state.is_voted[voter.address()].get() != Int(1)),
         Assert(Global.latest_timestamp() >= proposal_app.state.start_time.get()),
         Assert(Global.latest_timestamp() <= proposal_app.state.end_time.get()),
         Assert(proposal_app.state.is_executed.get() == Int(0)),
-        If(agree.get() == Int(0)).Then(proposal_app.state.disagree_counter.increment()
+        If(agree.get() == Int(0)).Then(
+            proposal_app.state.disagree_counter.increment()
         ).Else(
             proposal_app.state.agree_counter.increment()
         ),
+        proposal_app.state.is_voted[voter.address()].set(Int(1)),
         output.set(Int(1))
     )
 

@@ -2,7 +2,7 @@ from algosdk.abi import ABIType
 from beaker import client, localnet, consts
 from algosdk.transaction import PaymentTxn, AssetOptInTxn
 from algosdk.atomic_transaction_composer import TransactionWithSigner
-from marketplace_contract.cc_marketplace import (
+from cc_marketplace import (
     mkp_app,
     bootstrap,
     accept_auction,
