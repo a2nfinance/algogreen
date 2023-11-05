@@ -11,89 +11,79 @@ type Fund = {
 }
 type DaoState = {
     daoFromDB: {
-        _id?: string,
-        title: string,
-        description: string,
-        contract_name: string,
+        _id: string,
+        creator: string,
+        organization_name: string,
         owner: string,
-        quorum: number,
-        passing_threshold: number,
-        dao_type: number,
-        submission_policy: number,
-        dao_address: string,
-        treasury_address: string,
-        token_address?: string,
+        address: string,
+        city: string,
+        state: string,
+        zipcode: string,
+        country: string,
+        email: string,
+        phone_number: string,
+        description: string,
+        website: string,
         twitter: string,
-        github: string,
-        discord: string,
+        telegram: string,
+        facebook: string,
         status: number,
-        created_at?: any
+        dao_app_id: number,
+        token_id: number,
+        dao_title: string,
+        passing_threshold: number,
+        quorum: number,
+        submission_policy: number,
+        token_name: string,
+        token_supply: number,
     },
-    daoOnchain: {
-        // quorum: number,
-        // submission_policy: boolean,
-        // dao_type: number,
-        // owner: string,
-        // status: number,
-        count_proposal: number,
-        count_member: number,
-        balance: number,
-        // created_date: string,
-        whitelistedTokens: {hash: string, decimals: number, symbol: string}[],
-        funders: string[]
-        
-    },
+    appAccountInformation?: any,
     proposals: any[],
     members: any[],
-    treasury: Fund[],
-    openTasks: any[],
-    initialPayoutValues: any
+    loans: any[]
 }
 
 const initialState: DaoState = {
     daoFromDB: {
-        title: "",
-        description: "",
-        contract_name: "",
+        _id: "",
+        creator: "",
+        organization_name: "",
         owner: "",
-        quorum: 2000,
-        passing_threshold: 5000,
-        dao_type: 1,
-        submission_policy: 0,
-        dao_address: "",
-        treasury_address: "",
+        address: "",
+        city: "",
+        state: "",
+        zipcode: "",
+        country: "",
+        email: "",
+        phone_number: "",
+        description: "",
+        website: "",
         twitter: "",
-        github: "",
-        discord: "",
-        status: 1
-    },
-    daoOnchain:  {
-        // quorum: 0,
-        // submission_policy: false,
-        // dao_type: 1,
-        // owner: "",
-        // status: 1,
-        count_proposal: 0,
-        count_member: 0,
-        balance: 0,
-        // created_date: "",
-        whitelistedTokens: [],
-        funders: []
+        telegram: "",
+        facebook: "",
+        status: 3,
+        dao_app_id: 0,
+        token_id: 0,
+        dao_title: "",
+        passing_threshold: 50,
+        quorum: 20,
+        submission_policy: 1,
+        token_name: "",
+        token_supply: 1000,
     },
     proposals: [],
     members: [],
-    treasury: [],
-    openTasks: [],
-    initialPayoutValues: null
+    appAccountInformation: {},
+    loans: []
 }
 
 export const daoDetailSlice = createSlice({
     name: 'daoDetail',
     initialState: initialState,
     reducers: {
-        setDaoDetailProps: (state: DaoState, action: PayloadAction<{ daoFromDB: any, daoOnChain: any }>) => {
+        setDaoDetailProps: (state: DaoState, action: PayloadAction<{daoFromDB: any, appAccountInformation: any}>) => {
             state.daoFromDB = action.payload.daoFromDB;
-            state.daoOnchain = action.payload.daoOnChain;
+            state.appAccountInformation = action.payload.appAccountInformation;
         },
         setProposals: (state: DaoState, action: PayloadAction<any>) => {
             state.proposals = action.payload
@@ -101,19 +91,13 @@ export const daoDetailSlice = createSlice({
         setMembers: (state: DaoState, action: PayloadAction<any[]>) => {
             state.members = action.payload
         },
-        setTreasury: (state: DaoState, action: PayloadAction<Fund[]>) => {
-            state.treasury = action.payload
+        setAppAccountInformation: (state: DaoState, action: PayloadAction<any>) => {
+            state.appAccountInformation = action.payload;
         },
-        setFunders: (state: DaoState, action: PayloadAction<string[]>) => {
-            state.daoOnchain.funders = action.payload
-        },
-        setOpenTasks: (state: DaoState, action: PayloadAction<any[]>) => {
-            state.openTasks = action.payload
-        },
-        setInitialPayoutValues: (state: DaoState, action: PayloadAction<any>) => {
-            state.initialPayoutValues = action.payload
+        setLoans: (state: DaoState, action: PayloadAction<any[]>) => {
+            state.loans = action.payload;
         },
     }
 })
-export const { setDaoDetailProps, setProposals, setMembers, setTreasury, setFunders, setOpenTasks, setInitialPayoutValues } = daoDetailSlice.actions;
+export const { setDaoDetailProps, setProposals, setMembers, setAppAccountInformation, setLoans } = daoDetailSlice.actions;
 export default daoDetailSlice.reducer;

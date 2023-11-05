@@ -15,10 +15,13 @@ export const actionNames = {
     getDaosAction: "getDaosAction",
     getProposalsOfAction: "getProposalsOfAction",
     addFundAction: "addFundAction",
+    optInAssetAction: "optInAssetAction",
+    optInAppAction: "optInAppAction",
+    createLoanAction: "createLoanAction"
 }
 
 export const processKeys = {
-    processing: "processing",
+    processing: "processing"
 }
 
 type Processes = {
@@ -61,6 +64,15 @@ const initialState: Processes = {
     addFundAction: {
         processing: false
     },
+    optInAssetAction: {
+        processing: false
+    },
+    optInAppAction: {
+        processing: false
+    },
+    createLoanAction: {
+        processing: false
+    }
 }
 
 export const processesSlice = createSlice({

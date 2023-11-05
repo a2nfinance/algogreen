@@ -125,7 +125,7 @@ export const Proposals = () => {
                 <Button type="primary" onClick={() => {
                     //dispatch(setDaoDetailProps({att: "currentProposal", value: record}))
                     // showDrawerDetail()
-                    router.push(`/proposal/${daoFromDB.dao_address}/${record._id}`)
+                    router.push(`/proposal/${daoFromDB._id}/${record._id}`)
 
                 }}>Detail</Button>
             )
@@ -145,7 +145,7 @@ export const Proposals = () => {
 
         <Table
             pagination={{
-                pageSize: 6,
+                pageSize: 20,
                 position: ["bottomCenter"]
             }}
             dataSource={proposals}

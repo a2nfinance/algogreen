@@ -8,12 +8,12 @@ import { actionNames, processKeys, updateProcessStatus } from "src/controller/pr
 import { MESSAGE_TYPE, openNotification } from "./common";
 import { setDaoFormProps, updateDaoFormState } from "src/controller/dao/daoFormSlice";
 import { FormInstance } from "antd";
+import { setAppAccountInformation, setDaoDetailProps } from "src/controller/dao/daoDetailSlice";
+import { getAccountInfo } from "./util";
 // @ts-ignore
 const contract = new algosdk.ABIContract(abi);
 const proposalContract = new algosdk.ABIContract(proposalAbi);
-const appId = 468059037
-const tokenId = 468060065;
-const proposalId = 468067344;
+
 
 export const checkAccountInfo = async (address: string) => {
 
@@ -76,22 +76,48 @@ export const getDAOByCreatorAndId = async (creator: string, id: string, form?: F
         })
         let daoFromDB = await getReq.json();
         form ? form.setFieldsValue(daoFromDB) : {};
-        store.dispatch(setDaoFormProps({att: "generalForm", value: daoFromDB}));
-        if ([2,3].indexOf(daoFromDB.status) !== -1) {
-            store.dispatch(setDaoFormProps({att: "votingSettingForm", value: {
-                dao_title: daoFromDB.dao_title,
-                quorum: daoFromDB.quorum,
-                passing_threshold: daoFromDB.passing_threshold,
-                submission_policy: daoFromDB.submission_policy
-            }}))
+        store.dispatch(setDaoFormProps({ att: "generalForm", value: daoFromDB }));
+        if ([2, 3].indexOf(daoFromDB.status) !== -1) {
+            store.dispatch(setDaoFormProps({
+                att: "votingSettingForm", value: {
+                    dao_title: daoFromDB.dao_title,
+                    quorum: daoFromDB.quorum,
+                    passing_threshold: daoFromDB.passing_threshold,
+                    submission_policy: daoFromDB.submission_policy
+                }
+            }))
         }
         if (daoFromDB.status === 3) {
-            store.dispatch(setDaoFormProps({att: "tokenGovernanceForm", value: {
-                name: daoFromDB.token_name,
-                supply: daoFromDB.token_supply
-            }}))
+            store.dispatch(setDaoFormProps({
+                att: "tokenGovernanceForm", value: {
+                    name: daoFromDB.token_name,
+                    supply: daoFromDB.token_supply
+                }
+            }))
         }
 
+    } catch (e) {
+        console.error(e)
+    }
+
+
+}
+
+export const getDAODetailById = async (id: string) => {
+
+    try {
+        let getReq = await fetch("/api/database/dao/getById", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+            },
+            body: JSON.stringify({
+                _id: id
+            })
+        })
+        let daoFromDB = await getReq.json();
+        let appAccountInformation = await getAccountInfo(daoFromDB.dao_app_id);
+        store.dispatch(setDaoDetailProps({ daoFromDB: daoFromDB, appAccountInformation: appAccountInformation }));
     } catch (e) {
         console.error(e)
     }
@@ -106,12 +132,22 @@ export const fundDAO = async (
     sendTransactions: Function
 ) => {
     try {
-        const appAddress = algosdk.getApplicationAddress(appId);
+        if (!address) {
+            openNotification("Your wallet is not currently connected.", `To utilize ALGOGREEN features, please connect your wallet.`, MESSAGE_TYPE.INFO, () => { });
+            return;
+        }
+        store.dispatch(updateProcessStatus({
+            actionName: actionNames.addFundAction,
+            att: processKeys.processing,
+            value: true
+        }))
+        const { daoFromDB } = store.getState().daoDetail;
+        const appAddress = algosdk.getApplicationAddress(daoFromDB.dao_app_id);
         const suggestedParams = await algoClient.getTransactionParams().do();
         const fundTxn = algosdk.makePaymentTxnWithSuggestedParamsFromObject({
             from: address,
             to: appAddress,
-            amount: amount,
+            amount: Math.floor(amount * 10 ** 6),
             suggestedParams,
             note: (new ABIStringType()).encode("Fund DAO smart contracts")
         });
@@ -120,9 +156,24 @@ export const fundDAO = async (
         const signedTransactions = await signTransactions([encodedFundTransaction])
         const { id, txId, txn } = await sendTransactions(signedTransactions, waitRoundsToConfirm);
         console.log('Successfully sent transaction. Transaction ID: ', txId)
+
+
+        // Reload app account info
+        let appAccountInformation = await getAccountInfo(daoFromDB.dao_app_id);
+        store.dispatch(setAppAccountInformation(appAccountInformation));
+        openNotification("Fund DAO", `Fund ALGO asset successful!`, MESSAGE_TYPE.SUCCESS, () => { })
+
+
     } catch (e) {
-        console.log(e)
+        console.log(e);
+        openNotification("Fund DAO", `Fund ALGO asset fail!`, MESSAGE_TYPE.SUCCESS, () => { })
     }
+
+    store.dispatch(updateProcessStatus({
+        actionName: actionNames.addFundAction,
+        att: processKeys.processing,
+        value: false
+    }))
 }
 export const deployDAO = async (
     address: string,
@@ -140,7 +191,7 @@ export const deployDAO = async (
             att: processKeys.processing,
             value: true
         }))
-        const {votingSettingForm, generalForm} = store.getState().daoForm;
+        const { votingSettingForm, generalForm } = store.getState().daoForm;
 
         let request = await fetch(`/api/dao-contract`, {
             method: 'GET',
@@ -203,7 +254,7 @@ export const deployDAO = async (
         // Notification here
         openNotification("Deploy DAO", `Deploy DAO successful!: `, MESSAGE_TYPE.SUCCESS, () => { })
         // Get dao info again
-        await getDAOByCreatorAndId(generalForm.creator, generalForm._id);        
+        await getDAOByCreatorAndId(generalForm.creator, generalForm._id);
     } catch (e) {
         console.log(e);
         openNotification("Deploy DAO error", e.message, MESSAGE_TYPE.ERROR, () => { });
@@ -226,7 +277,7 @@ export const bootstrapDAO = async (
             openNotification("Your wallet is not currently connected.", `To utilize ALGOGREEN features, please connect your wallet.`, MESSAGE_TYPE.INFO, () => { });
             return;
         }
-        const {generalForm, tokenGovernanceForm} = store.getState().daoForm;
+        const { generalForm, tokenGovernanceForm } = store.getState().daoForm;
         if (address !== generalForm.creator) {
             openNotification("Your address is not match to DAO creator address.", `Please connect your correct wallet.`, MESSAGE_TYPE.INFO, () => { });
             return;
@@ -237,7 +288,7 @@ export const bootstrapDAO = async (
             att: processKeys.processing,
             value: true
         }))
-        
+
         const appAddress = algosdk.getApplicationAddress(generalForm.dao_app_id);
         const suggestedParams = await algoClient.getTransactionParams().do();
         const fundTxn = algosdk.makePaymentTxnWithSuggestedParamsFromObject({
@@ -269,7 +320,7 @@ export const bootstrapDAO = async (
         const encodedBootstrapTransaction = algosdk.encodeUnsignedTransaction(bootstrapAddTxn)
         const signedTransactions = await signTransactions([encodedFundTransaction, encodedBootstrapTransaction])
         const { id, txId, txn } = await sendTransactions(signedTransactions, waitRoundsToConfirm);
-        const createdTokenId = await getTokenId(appId);
+        const createdTokenId = await getTokenId(generalForm.dao_app_id);
         console.log("Membership token id:", createdTokenId)
         console.log('Successfully sent transaction. Transaction ID: ', txId);
         // Update database here
@@ -289,7 +340,7 @@ export const bootstrapDAO = async (
         });
         // Update
         openNotification("Create DAO token", `Create DAO token successful!: `, MESSAGE_TYPE.SUCCESS, () => { });
-        await getDAOByCreatorAndId(generalForm.creator, generalForm._id);        
+        await getDAOByCreatorAndId(generalForm.creator, generalForm._id);
     } catch (e) {
         console.log(e);
         openNotification("Create DAO token", e.message, MESSAGE_TYPE.ERROR, () => { });
@@ -329,30 +380,70 @@ export const optAccountIntoAsset = async (
     signTransactions: Function,
     sendTransactions: Function
 ) => {
-    const suggestedParams = await algoClient.getTransactionParams().do();
-    const optinTxn = algosdk.makeAssetTransferTxnWithSuggestedParamsFromObject({
-        from: address,
-        to: address,
-        amount: 0,
-        assetIndex: tokenId,
-        suggestedParams: { ...suggestedParams, fee: algosdk.ALGORAND_MIN_TX_FEE, flatFee: true },
-    })
+    try {
+        if (!address) {
+            openNotification("Your wallet is not currently connected.", `To utilize ALGOGREEN features, please connect your wallet.`, MESSAGE_TYPE.INFO, () => { });
+            return;
+        }
+        store.dispatch(updateProcessStatus({
+            actionName: actionNames.optInAssetAction,
+            att: processKeys.processing,
+            value: true
+        }))
+        const { daoFromDB } = store.getState().daoDetail;
+        const suggestedParams = await algoClient.getTransactionParams().do();
+        const optinTxn = algosdk.makeAssetTransferTxnWithSuggestedParamsFromObject({
+            from: address,
+            to: address,
+            amount: 0,
+            assetIndex: daoFromDB.token_id,
+            suggestedParams: { ...suggestedParams, fee: algosdk.ALGORAND_MIN_TX_FEE, flatFee: true },
+        })
 
-    const encodedOptinTransaction = algosdk.encodeUnsignedTransaction(optinTxn);
-    const signedTransactions = await signTransactions([encodedOptinTransaction])
-    const { id, txId, txn } = await sendTransactions(signedTransactions, waitRoundsToConfirm);
-    console.log('Successfully sent transaction. Transaction ID: ', txId)
+        const encodedOptinTransaction = algosdk.encodeUnsignedTransaction(optinTxn);
+        const signedTransactions = await signTransactions([encodedOptinTransaction])
+        const { id, txId, txn } = await sendTransactions(signedTransactions, waitRoundsToConfirm);
+        console.log('Successfully sent transaction. Transaction ID: ', txId)
+        openNotification("Opt-in", `Opt your account into the DAO asset successful!`, MESSAGE_TYPE.SUCCESS, () => { });
+    } catch (e) {
+        console.log(e);
+        openNotification("Opt-in",  e.message, MESSAGE_TYPE.SUCCESS, () => { });
+    }
+    store.dispatch(updateProcessStatus({
+        actionName: actionNames.optInAssetAction,
+        att: processKeys.processing,
+        value: false
+    }))
 }
 
 export const addMembers = async (
     address: string,
-    members: string[],
+    formValues: any[],
     signTransactions: Function,
     sendTransactions: Function
 ) => {
     try {
+        if (!address) {
+            openNotification("Your wallet is not currently connected.", `To utilize ALGOGREEN features, please connect your wallet.`, MESSAGE_TYPE.INFO, () => { });
+            return;
+        }
+
+        if (!formValues.length) {
+            return;
+        }
+
+        const members = formValues.map(v => v.address);
+
+        store.dispatch(updateProcessStatus({
+            actionName: actionNames.addMemberAction,
+            att: processKeys.processing,
+            value: true
+        }))
+
+        const {daoFromDB} = store.getState().daoDetail;
+
         const suggestedParams = await algoClient.getTransactionParams().do();
-        const appAddress = algosdk.getApplicationAddress(appId);
+        const appAddress = algosdk.getApplicationAddress(daoFromDB.dao_app_id);
         const fundTxn = algosdk.makePaymentTxnWithSuggestedParamsFromObject({
             from: address,
             to: appAddress,
@@ -366,14 +457,14 @@ export const addMembers = async (
         const addMemebersAddTxn = algosdk.makeApplicationCallTxnFromObject({
             from: address,
             suggestedParams: suggestedParams,
-            appIndex: appId,
+            appIndex: daoFromDB.dao_app_id,
             onComplete: algosdk.OnApplicationComplete.NoOpOC,
             appArgs: [
                 addMembersMethodSelector,
                 (new ABIArrayDynamicType(new ABIAddressType())).encode(members)
             ],
             accounts: members,
-            foreignAssets: [tokenId]
+            foreignAssets: [daoFromDB.token_id]
         });
 
         let txnArray = [fundTxn, addMemebersAddTxn];
@@ -384,10 +475,18 @@ export const addMembers = async (
         const encodedAddMembersTransaction = algosdk.encodeUnsignedTransaction(addMemebersAddTxn)
         const signedTransactions = await signTransactions([encodedFundTransaction, encodedAddMembersTransaction])
         const { id, txId, txn } = await sendTransactions(signedTransactions, waitRoundsToConfirm);
-        console.log('Successfully sent transaction. Transaction ID: ', txId)
+        console.log('Successfully sent transaction. Transaction ID: ', txId);
+        openNotification("Add members", `Add members successful!`, MESSAGE_TYPE.SUCCESS, () => { })
     } catch (e) {
-        console.log(e)
+        console.log(e);
+        openNotification("Add members",  e.message, MESSAGE_TYPE.ERROR, () => { })
     }
+
+    store.dispatch(updateProcessStatus({
+        actionName: actionNames.addMemberAction,
+        att: processKeys.processing,
+        value: false
+    }))
 
 }
 
