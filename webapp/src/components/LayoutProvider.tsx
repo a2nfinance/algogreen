@@ -101,7 +101,7 @@ export const LayoutProvider = (props: Props) => {
                                     key: '5.3',
                                     label: "New DAO",
                                     icon: <AiOutlineAppstoreAdd />,
-                                    onClick: () => router.push("/my-account/carbon-credits")
+                                    onClick: () => router.push("/dao/new")
                                 },
                                 {
                                     key: '5.4',

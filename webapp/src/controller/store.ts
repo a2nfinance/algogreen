@@ -2,18 +2,20 @@ import { configureStore, ThunkAction, Action } from '@reduxjs/toolkit'
 import { persistStore } from 'redux-persist';
 import accountReducer from "./account/accountSlice";
 import projectReducer from "./project/projectSlice";
-import processRedcucer from "./process/processSlice";
 import daoReducer from "./dao/daoSlice";
 import daoDetailReducer from "./dao/daoDetailSlice";
+import daoFormReducer from "./dao/daoFormSlice";
+import processReducer from './process/processSlice';
 
 export function makeStore() {
     return configureStore({
         reducer: {
             account: accountReducer,
             project: projectReducer,
-            process: processRedcucer,
             dao: daoReducer,
-            daoDetail: daoDetailReducer
+            daoDetail: daoDetailReducer,
+            daoForm: daoFormReducer,
+            process: processReducer
         },
         middleware: (getDefaultMiddleware) =>
             getDefaultMiddleware({

@@ -81,7 +81,7 @@ export default function Index() {
             <FeaturedProjects />
             <List /> */}
             <TestCore />
-            <ConnectMenu />
+            {/* <ConnectMenu /> */}
         </div>
     )
 }

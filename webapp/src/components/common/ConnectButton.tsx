@@ -1,14 +1,14 @@
-import { CopyOutlined, DisconnectOutlined } from "@ant-design/icons";
-import { Button, Dropdown, MenuProps, Modal } from "antd";
-import Image from "next/image";
-import { useEffect, useState } from "react";
-import { setAccountProps } from "src/controller/account/accountSlice";
-import { useAppDispatch, useAppSelector } from "src/controller/hooks";
+import { CopyOutlined, DisconnectOutlined, WalletOutlined } from "@ant-design/icons";
+import { useWallet } from "@txnlab/use-wallet";
+import { Button, Dropdown, MenuProps, Modal, Space, Typography } from "antd";
+import { useState } from "react";
+import { CiSettings } from "react-icons/ci";
+import { useAppDispatch } from "src/controller/hooks";
 import { useAddress } from "src/hooks/useAddress";
 import { ConnectMenu } from "./ConnectMenu";
-import { useWallet } from "@txnlab/use-wallet";
+const { Text, Link } = Typography;
 export const ConnectButton = () => {
-  const { providers, activeAccount } = useWallet()
+  const { providers, activeAccount, connectedActiveAccounts } = useWallet()
   const { getShortAddress } = useAddress();
   const dispatch = useAppDispatch();
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -24,52 +24,35 @@ export const ConnectButton = () => {
     setIsModalOpen(false);
   };
 
-  // useEffect(() => {
-  //   setTimeout(() => {
-  //     checkConnection();
-  //     setLoaded(true);
-  //   }, 500)
-  // }, [connected])
-
-  async function checkConnection() {
-    // if (wcSdk.isConnected()) {
-    //   let account = wcSdk.getAccountAddress();
-    //   dispatch(setAccountProps({ att: "account", value: account }))
-    //   setConnected(true);
-    // }
-  }
-
-
-
-  const connect = async () => {
-    // if (window.NEOLineN3) {
+  const disconnect = () => {
     try {
-      // let account = await window.NEOLineN3.N3.getAccount();
-      // dispatch(setAccountProps({ att: "account", value: "account.address" }))
-      // setConnected(true);
+      providers.forEach(provider => {
+        if (provider.isConnected) {
+          provider.disconnect()
+        }
+      })
     } catch (e) {
-      console.log("Please accept connect")
+      console.log(e)
     }
-
-    // } else {
-    //   console.log("Please install NEO wallet")
-    // }
   }
 
-  const disconnect = async () => {
-    // if (window.NEOLineN3 && account) {
-    try {
-
-    } catch (e) {
-      console.log("Please accept connect")
-    }
-
-    // } else {
-    //   console.log("Please install NEO wallet")
-    // }
+  const changeActiveAccount = (acc: string) => {
+    providers.forEach(provider => {
+      if (provider.isConnected) {
+        provider.setActiveAccount(acc)
+      }
+    })
   }
 
-  const items: MenuProps['items'] = [
+  const items: MenuProps['items'] = connectedActiveAccounts.map(acc =>
+  ({
+    key: acc.name,
+    label: getShortAddress(acc.address),
+    onClick: () => changeActiveAccount(acc.address)
+  })
+  )
+
+  const actionItems: MenuProps['items'] = [
     {
       key: '1',
       label: (
@@ -88,14 +71,24 @@ export const ConnectButton = () => {
         </a>
       ),
       icon: <DisconnectOutlined />,
-      onClick: () => { }
+      onClick: () => disconnect()
     }
   ];
+
   return (
     <>
-      {activeAccount ? <Dropdown menu={{ items }} placement="bottomLeft" arrow>
-        <Button onClick={() => { }} icon={<Image alt="ae" width={30} height={30} src={"/neo-icon.png"} style={{ paddingRight: "5px" }} />} type="primary" size="large">{getShortAddress(activeAccount?.address)}</Button>
-      </Dropdown> : <Button type="primary" size="large" onClick={() => showModal()}>Connect Wallet</Button>}
+      {activeAccount ? <Space wrap>
+        <Dropdown menu={{ items }} placement="bottomLeft" arrow>
+          <Button
+            type="primary" icon={<WalletOutlined />} size="large">{getShortAddress(activeAccount?.address)}</Button>
+        </Dropdown>
+
+        <Dropdown menu={{ items: actionItems }} placement="bottomLeft" arrow>
+          <Button onClick={() => { }}
+            type="dashed" size="large" shape="circle"><CiSettings /></Button>
+        </Dropdown>
+      </Space>
+        : <Button type="primary" size="large" onClick={() => showModal()}>Connect Wallet</Button>}
       <Modal title="Basic Modal" open={isModalOpen} onOk={handleOk} onCancel={handleCancel} footer={null}>
         <ConnectMenu />
       </Modal>
