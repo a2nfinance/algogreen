@@ -10,6 +10,7 @@ import { useEffect } from "react";
 
 export const General = ({ isNewForm }: { isNewForm: boolean }) => {
     const router = useRouter();
+    const { id } = router.query
     const {generalForm} = useAppSelector(state => state.daoForm)
     const dispatch = useAppDispatch();
     const { activeAccount } = useWallet();
@@ -25,7 +26,7 @@ export const General = ({ isNewForm }: { isNewForm: boolean }) => {
             dispatch(updateDaoFormState(1));
         }
     };
-    const { id } = router.query
+    
     useEffect(() => {
         if (id) {
             getDAOByCreatorAndId(activeAccount?.address, id.toString(), form)

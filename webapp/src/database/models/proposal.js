@@ -48,6 +48,11 @@ let proposal = new Schema({
         required: true,
         default: 0
     },
+    is_repaid: {
+        type: Number,
+        required: true,
+        default: 0
+    },
     title: {
         type: String,
         required: true,

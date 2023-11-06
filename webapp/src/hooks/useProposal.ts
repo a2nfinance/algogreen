@@ -3,7 +3,10 @@ import { DaoFromDB } from "src/controller/dao/daoDetailSlice";
 
 export const useProposal = () => {
     const checkPass = (daoFromDB: DaoFromDB, onchainDAO: any[], onchainProposal: any) => {
-        let countMember = onchainDAO.filter(d => d.key === "count_member")[0].value;
+        let data = onchainDAO.filter(d => d.key === "count_member");
+        let countMember = data.length ? data[0].value : 0;
+
+        if (!countMember) return false;
 
         const passingThreshold = daoFromDB.passing_threshold;
         const quorum = daoFromDB.quorum;

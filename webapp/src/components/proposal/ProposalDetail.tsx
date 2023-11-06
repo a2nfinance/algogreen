@@ -3,26 +3,34 @@ import { useWallet } from "@txnlab/use-wallet";
 import { Button, Card, Descriptions, Divider, Space } from "antd";
 import { useRouter } from "next/router";
 import { useAppSelector } from "src/controller/hooks";
-import { executeProposal, vote } from "src/core/dao";
+import { executeProposal, repayProposal, vote } from "src/core/dao";
 import { useProposal } from "src/hooks/useProposal";
 
 export const ProposalDetail = () => {
     const { activeAccount, signTransactions, sendTransactions } = useWallet();
-    const {voteAction, executeProposalAction} = useAppSelector(state => state.process);
-    const {checkPass} = useProposal();
+    const { voteAction, executeProposalAction, repayAction } = useAppSelector(state => state.process);
+    const { checkPass } = useProposal();
     const router = useRouter();
     const { proposal, onchainProposal } = useAppSelector(state => state.proposal);
     const { daoFromDB, onchainDAO } = useAppSelector(state => state.daoDetail);
     return (
         <Card title={proposal.title}>
 
-            <Space>
-                <Button loading={voteAction.processing} disabled={proposal.executed === 1} type="primary" size="large" onClick={() => vote(activeAccount?.address, 1, signTransactions, sendTransactions)}>Agree ({onchainProposal.filter(p => p.key === "agree_counter")[0].value})</Button>
-                <Button loading={voteAction.processing} disabled={proposal.executed === 1} size="large" onClick={() => vote(activeAccount?.address, 0, signTransactions, sendTransactions)}>Disagree ({onchainProposal.filter(p => p.key === "disagree_counter")[0].value})</Button>
+            {!proposal.executed && <Space>
+                <Button loading={voteAction.processing} type="primary" size="large" onClick={() => vote(activeAccount?.address, 1, signTransactions, sendTransactions)}>Agree ({onchainProposal.filter(p => p.key === "agree_counter")[0].value})</Button>
+                <Button loading={voteAction.processing} size="large" onClick={() => vote(activeAccount?.address, 0, signTransactions, sendTransactions)}>Disagree ({onchainProposal.filter(p => p.key === "disagree_counter")[0].value})</Button>
                 {
                     checkPass(daoFromDB, onchainDAO, onchainProposal) && <Button loading={executeProposalAction.processing} type="primary" onClick={() => executeProposal(activeAccount?.address, signTransactions, sendTransactions)} size="large">Execute & send ALGO to borrower</Button>
                 }
-            </Space>
+            </Space>}
+            {
+                (proposal.executed && !proposal.is_repaid && activeAccount?.address === proposal.creator) && <Button
+                    loading={repayAction.processing}
+                    type="primary"
+                    onClick={() => repayProposal(activeAccount?.address, signTransactions, sendTransactions)} size="large">
+                    Repay - token amount is {proposal.borrow_amount * (1+proposal.interest_rate/100)} ALGO
+                </Button>
+            }
             <Divider />
             <Descriptions column={2} title="General info" layout="vertical">
                 <Descriptions.Item label={"Borrow amount (ALGO)"}>{proposal.borrow_amount}</Descriptions.Item>

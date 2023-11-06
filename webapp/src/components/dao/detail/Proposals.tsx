@@ -80,11 +80,19 @@ export const Proposals = () => {
             )
         },
         {
-            title: "Status",
-            dataIndex: "status",
-            key: "status",
+            title: "Executed",
+            dataIndex: "executed",
+            key: "executed",
             render: (_, record) => (
-                <Tag color={colorMap(record.executed ? 2 : record.status)}>{statusMap(record.executed ? 2 : record.status)}</Tag>
+                <Tag color={colorMap(record.executed)}>{record.executed ? "Yes" : "Not yet"}</Tag>
+            )
+        },
+        {
+            title: "Repaid",
+            dataIndex: "is_repaid",
+            key: "is_repaid",
+            render: (_, record) => (
+                <Tag color={colorMap(record.is_repaid)}>{record.is_repaid ? "Yes" : "Not yet"}</Tag>
             )
         },
         {

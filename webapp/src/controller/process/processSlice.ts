@@ -19,7 +19,8 @@ export const actionNames = {
     optInAppAction: "optInAppAction",
     createLoanAction: "createLoanAction",
     createNewProjectAction: "createNewProjectAction",
-    updateProjectAction: "updateProjectAction"
+    updateProjectAction: "updateProjectAction",
+    repayAction: "repayAction"
 }
 
 export const processKeys = {
@@ -79,6 +80,9 @@ const initialState: Processes = {
         processing: false
     },
     updateProjectAction: {
+        processing: false
+    },
+    repayAction: {
         processing: false
     }
 }

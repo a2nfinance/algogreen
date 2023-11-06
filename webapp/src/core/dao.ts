@@ -10,10 +10,11 @@ import { setDaoFormProps, updateDaoFormState } from "src/controller/dao/daoFormS
 import { FormInstance } from "antd";
 import { setAppAccountInformation, setDaoDetailProps } from "src/controller/dao/daoDetailSlice";
 import { getAccountInfo, getAppInfo } from "./util";
-import { getOnchainProposal } from "./proposal";
+import { getDAOProposals, getOnchainProposal } from "./proposal";
 import { setProposalState } from "src/controller/proposal/proposalSlice";
 // @ts-ignore
 const contract = new algosdk.ABIContract(abi);
+// @ts-ignore
 const proposalContract = new algosdk.ABIContract(proposalAbi);
 
 
@@ -701,8 +702,8 @@ export const executeProposal = async (
             att: processKeys.processing,
             value: true
         }))
-        const {proposal} = store.getState().proposal;
-        const {daoFromDB} = store.getState().daoDetail;
+        const { proposal } = store.getState().proposal;
+        const { daoFromDB } = store.getState().daoDetail;
         // If use local state to check a member voted or not yet, need to a opt-in transaction
         const suggestedParams = await algoClient.getTransactionParams().do();
         const executeProposalMethodSelector = algosdk.getMethodByName(contract.methods, 'execute_proposal').getSelector();
@@ -714,7 +715,7 @@ export const executeProposal = async (
             appArgs: [
                 executeProposalMethodSelector,
                 algosdk.encodeUint64(proposal.proposal_app_id),
-                algosdk.encodeUint64(proposal.borrow_amount * 10**6),
+                algosdk.encodeUint64(proposal.borrow_amount * 10 ** 6),
                 (new ABIAddressType()).encode(proposal.creator)
             ],
             foreignApps: [proposal.proposal_app_id],
@@ -727,18 +728,19 @@ export const executeProposal = async (
 
         console.log('Successfully sent transaction. Transaction ID: ', txId);
         // Update database
-        await fetch("/api/database/dao/update", {
+        await fetch("/api/database/proposal/update", {
             method: "POST",
             headers: {
                 "Content-Type": "application/json",
             },
             body: JSON.stringify({
-                _id: id,
+                _id: proposal._id,
                 executed: 1
             })
         })
         // dispatch proposal detail
-        store.dispatch(setProposalState({att: "proposal", value: {...proposal, executed: 1}}))
+        store.dispatch(setProposalState({ att: "proposal", value: { ...proposal, executed: 1 } }))
+        getDAOProposals(daoFromDB._id);
         openNotification("Execute proposal", `Execute proposal successful!`, MESSAGE_TYPE.SUCCESS, () => { });
     } catch (e) {
         console.log(e);
@@ -756,35 +758,78 @@ export const repayProposal = async (
     signTransactions: Function,
     sendTransactions: Function
 ) => {
-    const appAddress = algosdk.getApplicationAddress(appId);
-    const suggestedParams = await algoClient.getTransactionParams().do();
+    try {
+        if (!address) {
+            openNotification("Your wallet is not currently connected.", `To utilize ALGOGREEN features, please connect your wallet.`, MESSAGE_TYPE.INFO, () => { });
+            return;
+        }
 
-    const repayTxn = algosdk.makePaymentTxnWithSuggestedParamsFromObject({
-        from: address,
-        to: appAddress,
-        amount: parseInt(`${500_000 * 1.09}`),
-        suggestedParams,
-        note: (new ABIStringType()).encode("Repay Transaction"),
-    });
+        const { proposal } = store.getState().proposal;
+        const { daoFromDB } = store.getState().daoDetail;
+        if (address !== proposal.creator) {
+            openNotification("Your are not borrower.", `To utilize ALGOGREEN features, please connect your wallet.`, MESSAGE_TYPE.INFO, () => { });
+            return;
+        }
 
-    const repayProposalMethodSelector = algosdk.getMethodByName(contract.methods, 'repay_proposal').getSelector();
-    const repayProposalTxn = algosdk.makeApplicationCallTxnFromObject({
-        from: address,
-        suggestedParams: suggestedParams,
-        appIndex: appId,
-        onComplete: algosdk.OnApplicationComplete.NoOpOC,
-        appArgs: [
-            repayProposalMethodSelector,
-            algosdk.encodeUint64(proposalId),
-        ],
-        foreignApps: [proposalId]
-    });
-    let txnArray = [repayTxn, repayProposalTxn];
-    let groupID = algosdk.computeGroupID(txnArray);
-    for (let i = 0; i < 2; i++) txnArray[i].group = groupID;
+        store.dispatch(updateProcessStatus({
+            actionName: actionNames.repayAction,
+            att: processKeys.processing,
+            value: true
+        }))
+        const appAddress = algosdk.getApplicationAddress(daoFromDB.dao_app_id);
+        const suggestedParams = await algoClient.getTransactionParams().do();
 
-    const encodedExecuteTransaction = algosdk.encodeUnsignedTransaction(repayProposalTxn)
-    const signedTransactions = await signTransactions([encodedExecuteTransaction])
-    const { id, txId, txn } = await sendTransactions(signedTransactions, waitRoundsToConfirm);
-    console.log('Successfully sent transaction. Transaction ID: ', txId)
+        const repayTxn = algosdk.makePaymentTxnWithSuggestedParamsFromObject({
+            from: address,
+            to: appAddress,
+            amount: parseInt(`${proposal.borrow_amount * 10 ** 6 * (1 + proposal.interest_rate / 100)}`),
+            suggestedParams,
+            note: (new ABIStringType()).encode("Repay Transaction"),
+        });
+
+        const repayProposalMethodSelector = algosdk.getMethodByName(contract.methods, 'repay_proposal').getSelector();
+        const repayProposalTxn = algosdk.makeApplicationCallTxnFromObject({
+            from: address,
+            suggestedParams: suggestedParams,
+            appIndex: daoFromDB.dao_app_id,
+            onComplete: algosdk.OnApplicationComplete.NoOpOC,
+            appArgs: [
+                repayProposalMethodSelector,
+                algosdk.encodeUint64(proposal.proposal_app_id),
+            ],
+            foreignApps: [proposal.proposal_app_id]
+        });
+        let txnArray = [repayTxn, repayProposalTxn];
+        let groupID = algosdk.computeGroupID(txnArray);
+        for (let i = 0; i < 2; i++) txnArray[i].group = groupID;
+        const encodedRepayTransaction = algosdk.encodeUnsignedTransaction(repayTxn)
+        const encodedRepayProposalTransaction = algosdk.encodeUnsignedTransaction(repayProposalTxn)
+        const signedTransactions = await signTransactions([encodedRepayTransaction, encodedRepayProposalTransaction])
+        const { id, txId, txn } = await sendTransactions(signedTransactions, waitRoundsToConfirm);
+        console.log('Successfully sent transaction. Transaction ID: ', txId);
+
+        // Update database
+        await fetch("/api/database/proposal/update", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+            },
+            body: JSON.stringify({
+                _id: proposal._id,
+                is_repaid: 1
+            })
+        })
+        // dispatch proposal detail
+        store.dispatch(setProposalState({ att: "proposal", value: { ...proposal, is_repaid: 1 } }));
+        getDAOProposals(daoFromDB._id);
+        openNotification("Repay proposal", `Repay proposal successful!`, MESSAGE_TYPE.SUCCESS, () => { });
+    } catch (e) {
+        console.log(e);
+        openNotification("Repay proposal", e.message, MESSAGE_TYPE.ERROR, () => { })
+    }
+    store.dispatch(updateProcessStatus({
+        actionName: actionNames.repayAction,
+        att: processKeys.processing,
+        value: false
+    }))
 }

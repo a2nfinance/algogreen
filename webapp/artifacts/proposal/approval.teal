@@ -1,5 +1,5 @@
 #pragma version 8
-intcblock 0 1 10000 100
+intcblock 0 1 10000
 bytecblock 0x61677265655f636f756e746572 0x64697361677265655f636f756e746572 0x69735f6578656375746564 0x64616f5f6170705f61646472657373 0x 0x6f776e6572 0x656e645f74696d65 0x626f72726f775f616d6f756e74 0x69735f726570616964 0x65786563757465645f6174 0x151f7c75 0x73746172745f74696d65 0x616c6c6f775f6561726c795f657865637574696f6e 0x616c6c6f775f6561726c795f7265706179 0x696e7465726573745f72617465 0x7465726d 0x69735f766f746564
 txna ApplicationArgs 0
 pushbytes 0x273612da // "create(address,uint64,address,string,uint64,uint64,uint64,uint64,uint64,uint64,uint64,uint64)void"
@@ -365,7 +365,7 @@ proto 3 1
 frame_dig -2
 bytec_0 // "agree_counter"
 app_global_get
-intc_3 // 100
+intc_2 // 10000
 *
 bytec_0 // "agree_counter"
 app_global_get
@@ -380,7 +380,7 @@ app_global_get
 bytec_1 // "disagree_counter"
 app_global_get
 +
-intc_3 // 100
+intc_2 // 10000
 *
 frame_dig -1
 /

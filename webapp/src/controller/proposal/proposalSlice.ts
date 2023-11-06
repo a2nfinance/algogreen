@@ -18,7 +18,8 @@ type ProposalItem = {
     borrow_amount: number,
     created_at: string,
     interest_rate?: number,
-    term: number
+    term: number,
+    is_repaid?: number
 }
 
 type state = {
@@ -50,6 +51,7 @@ const initialState: state = {
         created_at: new Date().toLocaleString(),
         interest_rate: 0,
         term: 0,
+        is_repaid: 0
 
     },
     onchainProposal: [{key: "agree_counter", value: 0}, {key: "disagree_counter", value: 0} ]
