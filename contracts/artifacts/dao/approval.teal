@@ -224,6 +224,9 @@ itxn_field TypeEnum
 frame_dig -2
 extract 2 0
 itxn_field ConfigAssetName
+frame_dig -2
+extract 2 0
+itxn_field ConfigAssetUnitName
 frame_dig -1
 itxn_field ConfigAssetTotal
 intc_1 // 1

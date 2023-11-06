@@ -91,6 +91,7 @@ def bootstrap(
             {
                 TxnField.type_enum: TxnType.AssetConfig,
                 TxnField.config_asset_name: token_name.get(),
+                TxnField.config_asset_unit_name: token_name.get(),
                 TxnField.config_asset_total: token_supply.get(),
                 TxnField.config_asset_default_frozen: Int(1),
                 TxnField.config_asset_manager: Global.current_application_address(),

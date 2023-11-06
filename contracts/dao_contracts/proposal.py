@@ -196,8 +196,8 @@ def get_aggree_counter(*, output: abi.Uint64):
 def is_passed(quorum: abi.Uint64, passing_threshold: abi.Uint64, count_member: abi.Uint64) -> Expr:
     count_all_votes = proposal_app.state.agree_counter.get() + proposal_app.state.disagree_counter.get()
     return And(
-        passing_threshold.get() <= proposal_app.state.agree_counter.get() * Int(100) / count_all_votes,
-        quorum.get() <= count_all_votes * Int(100) / count_member.get()
+        passing_threshold.get() <= proposal_app.state.agree_counter.get() * Int(10000) / count_all_votes,
+        quorum.get() <= count_all_votes * Int(10000) / count_member.get()
     )
     
 
