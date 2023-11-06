@@ -8,7 +8,7 @@ import { createNewLoanProgram } from 'src/core/loan';
 const { RangePicker } = DatePicker;
 
 export const LoanForm = () => {
-    const { activeAccount, signTransactions, sendTransactions } = useWallet();
+    const { activeAccount } = useWallet();
     const { createLoanAction } = useAppSelector(state => state.process);
     const editorRef = useRef(null);
     const [form] = Form.useForm();
@@ -82,7 +82,7 @@ export const LoanForm = () => {
 
 
             <Divider />
-            <Form.Item name={"description"} label={"Description"} rules={[{ required: true, message: 'Missing description' }]} noStyle>
+            <Form.Item name={"description"} label={"Requirement description"} rules={[{ required: true, message: 'Missing description' }]} noStyle>
                 <Input size='large' type='hidden' />
             </Form.Item>
 
@@ -90,7 +90,7 @@ export const LoanForm = () => {
                 apiKey='1n11uzr2bd1kkoxh5dtycsp075phj3ivlopf4veknfhgxfyo'
                 onChange={() => form.setFieldValue("description", editorRef.current.getContent())}
                 onInit={(evt, editor) => editorRef.current = editor}
-                initialValue={`<p>Details description</p>`}
+                initialValue={`<p>Requirement description</p>`}
                 init={{
                     height: 350,
                     menubar: false,

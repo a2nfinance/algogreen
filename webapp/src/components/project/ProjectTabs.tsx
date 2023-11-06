@@ -13,13 +13,8 @@ export const ProjectTabs = () => {
     const items: TabsProps['items'] = [
         {
             key: '1',
-            label: `Loan proposal`,
+            label: `Proposal`,
             children:  <ProposalList />,
-        },
-        {
-            key: '3',
-            label: `Loan contracts`,
-            children: <RecievedLoan />
         },
         {
             key: '4',

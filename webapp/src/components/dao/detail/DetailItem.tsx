@@ -11,7 +11,7 @@ export const DetailItem = () => {
   const { daoFromDB } = useAppSelector(state => state.daoDetail)
 
   return (
-    <Card headStyle={headStyle} title={daoFromDB.organization_name} style={{ backgroundColor: "#f5f5f5" }}>
+    <Card title={daoFromDB.organization_name} headStyle={headStyle} style={{ backgroundColor: "#f5f5f5" }}>
       <Descriptions title={"Organization"} layout={"vertical"} column={2}>
         <Descriptions.Item label={"Owner"}>{daoFromDB.owner}</Descriptions.Item>
 

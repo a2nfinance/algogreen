@@ -107,7 +107,7 @@ export const LayoutProvider = (props: Props) => {
                                     key: '5.4',
                                     label: "New Project",
                                     icon: <AiOutlineFileAdd />,
-                                    onClick: () => router.push("/my-account/carbon-credits")
+                                    onClick: () => router.push("/project/new")
                                 },
                                 // {
                                 //     key: '7',

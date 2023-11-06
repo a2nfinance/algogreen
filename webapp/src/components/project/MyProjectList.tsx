@@ -1,21 +1,19 @@
-import { Col, Row, List } from "antd";
+import { List } from "antd";
 import { useEffect } from "react";
 import { useAppSelector } from "src/controller/hooks";
-// import { getDaos } from "src/core";
+import { useWallet } from "@txnlab/use-wallet";
+import { getMyProjects } from "src/core/project";
 import { Item } from "./Item";
 
 export const MyProjectList = () => {
-    // const { featuredProjects } = useAppSelector(state => state.project)
-    const featuredProjects = [1,2,3,5,6,7,8,9,10].map( m=> {
-        return {
-            id: m,
-            title: `${m} title`,
-            description: `${m} description`
-        }
-    })
+    const {activeAccount} = useWallet();
+    const {myProjects} = useAppSelector(state => state.project)
     useEffect(() => {
-        // getDaos()
-    }, [])
+        if(activeAccount?.address) {
+            getMyProjects(activeAccount?.address);
+        }
+       
+    }, [activeAccount?.address])
     return (
         <List
             grid={{
@@ -30,7 +28,7 @@ export const MyProjectList = () => {
                 pageSize: 9,
                 align: "center",
             }}
-            dataSource={featuredProjects}
+            dataSource={myProjects}
             renderItem={(item, index) => (
                 <Item index={index} project={item} />
             )}

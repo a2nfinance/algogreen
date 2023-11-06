@@ -6,6 +6,8 @@ import daoReducer from "./dao/daoSlice";
 import daoDetailReducer from "./dao/daoDetailSlice";
 import daoFormReducer from "./dao/daoFormSlice";
 import processReducer from './process/processSlice';
+import loanReducer from './loan/loanSlice';
+import proposalReducer from './proposal/proposalSlice';
 
 export function makeStore() {
     return configureStore({
@@ -15,7 +17,9 @@ export function makeStore() {
             dao: daoReducer,
             daoDetail: daoDetailReducer,
             daoForm: daoFormReducer,
-            process: processReducer
+            process: processReducer,
+            loan: loanReducer,
+            proposal: proposalReducer
         },
         middleware: (getDefaultMiddleware) =>
             getDefaultMiddleware({
@@ -35,6 +39,6 @@ export type AppThunk<ReturnType = void> = ThunkAction<
     AppState,
     unknown,
     Action<string>
-    >
+>
 
-export const persistor  = persistStore(store)    
+export const persistor = persistStore(store)    

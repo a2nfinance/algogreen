@@ -9,7 +9,9 @@ import { MESSAGE_TYPE, openNotification } from "./common";
 import { setDaoFormProps, updateDaoFormState } from "src/controller/dao/daoFormSlice";
 import { FormInstance } from "antd";
 import { setAppAccountInformation, setDaoDetailProps } from "src/controller/dao/daoDetailSlice";
-import { getAccountInfo } from "./util";
+import { getAccountInfo, getAppInfo } from "./util";
+import { getOnchainProposal } from "./proposal";
+import { setProposalState } from "src/controller/proposal/proposalSlice";
 // @ts-ignore
 const contract = new algosdk.ABIContract(abi);
 const proposalContract = new algosdk.ABIContract(proposalAbi);
@@ -117,7 +119,8 @@ export const getDAODetailById = async (id: string) => {
         })
         let daoFromDB = await getReq.json();
         let appAccountInformation = await getAccountInfo(daoFromDB.dao_app_id);
-        store.dispatch(setDaoDetailProps({ daoFromDB: daoFromDB, appAccountInformation: appAccountInformation }));
+        let state = await getAppInfo(daoFromDB.dao_app_id);
+        store.dispatch(setDaoDetailProps({ daoFromDB: daoFromDB, appAccountInformation: appAccountInformation, onchainDAO: state }));
     } catch (e) {
         console.error(e)
     }
@@ -407,7 +410,7 @@ export const optAccountIntoAsset = async (
         openNotification("Opt-in", `Opt your account into the DAO asset successful!`, MESSAGE_TYPE.SUCCESS, () => { });
     } catch (e) {
         console.log(e);
-        openNotification("Opt-in",  e.message, MESSAGE_TYPE.SUCCESS, () => { });
+        openNotification("Opt-in", e.message, MESSAGE_TYPE.SUCCESS, () => { });
     }
     store.dispatch(updateProcessStatus({
         actionName: actionNames.optInAssetAction,
@@ -440,7 +443,7 @@ export const addMembers = async (
             value: true
         }))
 
-        const {daoFromDB} = store.getState().daoDetail;
+        const { daoFromDB } = store.getState().daoDetail;
 
         const suggestedParams = await algoClient.getTransactionParams().do();
         const appAddress = algosdk.getApplicationAddress(daoFromDB.dao_app_id);
@@ -479,7 +482,7 @@ export const addMembers = async (
         openNotification("Add members", `Add members successful!`, MESSAGE_TYPE.SUCCESS, () => { })
     } catch (e) {
         console.log(e);
-        openNotification("Add members",  e.message, MESSAGE_TYPE.ERROR, () => { })
+        openNotification("Add members", e.message, MESSAGE_TYPE.ERROR, () => { })
     }
 
     store.dispatch(updateProcessStatus({
@@ -492,15 +495,28 @@ export const addMembers = async (
 
 export const createProposal = async (
     address: string,
+    formValues: FormInstance<any>,
     signTransactions: Function,
     sendTransactions: Function
 ) => {
     try {
+        if (!address) {
+            openNotification("Your wallet is not currently connected.", `To utilize ALGOGREEN features, please connect your wallet.`, MESSAGE_TYPE.INFO, () => { });
+            return;
+        }
+        store.dispatch(updateProcessStatus({
+            actionName: actionNames.createProposalAction,
+            att: processKeys.processing,
+            value: true
+        }))
+
+        const { daoFromDB } = store.getState().daoDetail;
+        const { loanDetail } = store.getState().loan;
         const minimumFund = 100000 +
             + (25000 + 3500) * 15
             + (25000 + 25000) * 3
         const suggestedParams = await algoClient.getTransactionParams().do();
-        const appAddress = algosdk.getApplicationAddress(appId);
+        const appAddress = algosdk.getApplicationAddress(daoFromDB.dao_app_id);
         const fundTxn = algosdk.makePaymentTxnWithSuggestedParamsFromObject({
             from: address,
             to: appAddress,
@@ -510,22 +526,26 @@ export const createProposal = async (
         });
 
         const createProposalMethodSelector = algosdk.getMethodByName(contract.methods, 'create_proposal').getSelector();
-        const now = moment().unix();
+        let startTime = new Date(formValues["date"][0]).getTime();
+        let unixStartTime = Math.floor(startTime / 1000);
+        let endTime = new Date(formValues["date"][1]).getTime();
+        let unixEndTime = Math.floor(endTime / 1000);
+        let interestRate = parseInt(formValues["is_eco_project"]) === 1 ? loanDetail.special_interest_rate : loanDetail.general_interest_rate;
         const creteProposalAddTxn = algosdk.makeApplicationCallTxnFromObject({
             from: address,
             suggestedParams: suggestedParams,
-            appIndex: appId,
+            appIndex: daoFromDB.dao_app_id,
             onComplete: algosdk.OnApplicationComplete.NoOpOC,
             appArgs: [
                 createProposalMethodSelector,
-                (new ABIStringType()).encode("New proposal"),
-                algosdk.encodeUint64(now),
-                algosdk.encodeUint64(now + 100000),
-                algosdk.encodeUint64(1),
-                algosdk.encodeUint64(1),
-                algosdk.encodeUint64(500_000),
-                algosdk.encodeUint64(900),
-                algosdk.encodeUint64(12),
+                (new ABIStringType()).encode(formValues["title"]),
+                algosdk.encodeUint64(unixStartTime),
+                algosdk.encodeUint64(unixEndTime),
+                algosdk.encodeUint64(parseInt(formValues["allow_early_execution"])),
+                algosdk.encodeUint64(loanDetail.allow_early_repay),
+                algosdk.encodeUint64(Math.floor(parseFloat(formValues["borrow_amount"]) * 10 ** 6)),
+                algosdk.encodeUint64(interestRate * 100),
+                algosdk.encodeUint64(loanDetail.term),
             ],
         });
 
@@ -537,35 +557,65 @@ export const createProposal = async (
         const encodedCreateProposalTransaction = algosdk.encodeUnsignedTransaction(creteProposalAddTxn)
         const signedTransactions = await signTransactions([encodedFundTransaction, encodedCreateProposalTransaction])
         const { id, txId, txn } = await sendTransactions(signedTransactions, waitRoundsToConfirm);
-        const proposalAppId = await getAppIdFromInnerTxn(txId);
+        const daoAppAccountInfo = await getAccountInfo(daoFromDB.dao_app_id);
+        const proposalAppId = daoAppAccountInfo["created-apps"][daoAppAccountInfo["total-created-apps"] - 1]["id"];
         console.log("Created Proposal App ID:", proposalAppId);
-        console.log('Successfully sent transaction. Transaction ID: ', txId)
+        console.log('Successfully sent transaction. Transaction ID: ', txId);
+
+        //Save database here
+        await fetch("/api/database/proposal/save", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+            },
+            body: JSON.stringify({
+                ...formValues,
+                start_time: startTime,
+                end_time: endTime,
+                dao_id: daoFromDB._id,
+                loan_id: loanDetail._id,
+                creator: address,
+                proposal_app_id: proposalAppId,
+                allow_early_repay: loanDetail.allow_early_repay,
+                interest_rate: interestRate,
+                term: loanDetail.term
+            })
+        })
+
+        // Noti
+        openNotification("Create proposal", `Create proposal successful!`, MESSAGE_TYPE.SUCCESS, () => { })
     } catch (e) {
-        console.log(e)
+        console.log(e);
+        openNotification("Create proposal", e.message, MESSAGE_TYPE.ERROR, () => { })
     }
+    store.dispatch(updateProcessStatus({
+        actionName: actionNames.createProposalAction,
+        att: processKeys.processing,
+        value: false
+    }))
 }
 
-export const optAccountIntoApp = async (
-    address: string,
-    signTransactions: Function,
-    sendTransactions: Function
-) => {
-    const suggestedParams = await algoClient.getTransactionParams().do();
-    const optinProposalMethodSelector = algosdk.getMethodByName(proposalContract.methods, 'opt_in').getSelector();
-    const optinTxn = algosdk.makeApplicationOptInTxnFromObject(
-        {
-            from: address,
-            suggestedParams,
-            appIndex: proposalId,
-            appArgs: [optinProposalMethodSelector]
-        }
-    )
+// export const optAccountIntoApp = async (
+//     address: string,
+//     signTransactions: Function,
+//     sendTransactions: Function
+// ) => {
+//     const suggestedParams = await algoClient.getTransactionParams().do();
+//     const optinProposalMethodSelector = algosdk.getMethodByName(proposalContract.methods, 'opt_in').getSelector();
+//     const optinTxn = algosdk.makeApplicationOptInTxnFromObject(
+//         {
+//             from: address,
+//             suggestedParams,
+//             appIndex: proposalId,
+//             appArgs: [optinProposalMethodSelector]
+//         }
+//     )
 
-    const encodedOptinTransaction = algosdk.encodeUnsignedTransaction(optinTxn);
-    const signedTransactions = await signTransactions([encodedOptinTransaction])
-    const { id, txId, txn } = await sendTransactions(signedTransactions, waitRoundsToConfirm);
-    console.log('Successfully sent transaction. Transaction ID: ', txId)
-}
+//     const encodedOptinTransaction = algosdk.encodeUnsignedTransaction(optinTxn);
+//     const signedTransactions = await signTransactions([encodedOptinTransaction])
+//     const { id, txId, txn } = await sendTransactions(signedTransactions, waitRoundsToConfirm);
+//     console.log('Successfully sent transaction. Transaction ID: ', txId)
+// }
 
 
 export const vote = async (
@@ -574,57 +624,131 @@ export const vote = async (
     signTransactions: Function,
     sendTransactions: Function
 ) => {
-    // If use local state to check a member voted or not yet, need to a opt-in transaction
-    const suggestedParams = await algoClient.getTransactionParams().do();
-    const voteMethodSelector = algosdk.getMethodByName(contract.methods, 'vote').getSelector();
-    const voteTxn = algosdk.makeApplicationCallTxnFromObject({
-        from: address,
-        suggestedParams: suggestedParams,
-        appIndex: appId,
-        onComplete: algosdk.OnApplicationComplete.NoOpOC,
-        appArgs: [
-            voteMethodSelector,
-            algosdk.encodeUint64(proposalId),
-            algosdk.encodeUint64(agree)
-        ],
-        foreignApps: [proposalId],
-        foreignAssets: [tokenId]
-    });
+    try {
+        if (!address) {
+            openNotification("Your wallet is not currently connected.", `To utilize ALGOGREEN features, please connect your wallet.`, MESSAGE_TYPE.INFO, () => { });
+            return;
+        }
+        store.dispatch(updateProcessStatus({
+            actionName: actionNames.voteAction,
+            att: processKeys.processing,
+            value: true
+        }))
+        // If use local state to check a member voted or not yet, need to a opt-in transaction
+        // Validate here
+        const { daoFromDB } = store.getState().daoDetail;
+        const { proposal } = store.getState().proposal;
 
-    const encodedVoteTransaction = algosdk.encodeUnsignedTransaction(voteTxn)
-    const signedTransactions = await signTransactions([encodedVoteTransaction])
-    const { id, txId, txn } = await sendTransactions(signedTransactions, waitRoundsToConfirm);
-    console.log('Successfully sent transaction. Transaction ID: ', txId)
+        const suggestedParams = await algoClient.getTransactionParams().do();
+
+        const optinProposalMethodSelector = algosdk.getMethodByName(proposalContract.methods, 'opt_in').getSelector();
+        const optinTxn = algosdk.makeApplicationOptInTxnFromObject(
+            {
+                from: address,
+                suggestedParams,
+                appIndex: proposal.proposal_app_id,
+                appArgs: [optinProposalMethodSelector]
+            }
+        )
+
+        const voteMethodSelector = algosdk.getMethodByName(contract.methods, 'vote').getSelector();
+        const voteTxn = algosdk.makeApplicationCallTxnFromObject({
+            from: address,
+            suggestedParams: suggestedParams,
+            appIndex: daoFromDB.dao_app_id,
+            onComplete: algosdk.OnApplicationComplete.NoOpOC,
+            appArgs: [
+                voteMethodSelector,
+                algosdk.encodeUint64(proposal.proposal_app_id),
+                algosdk.encodeUint64(agree)
+            ],
+            foreignApps: [proposal.proposal_app_id],
+            foreignAssets: [daoFromDB.token_id]
+        });
+        let txnArray = [optinTxn, voteTxn];
+        let groupID = algosdk.computeGroupID(txnArray);
+        for (let i = 0; i < 2; i++) txnArray[i].group = groupID;
+        const encodedOptinTransaction = algosdk.encodeUnsignedTransaction(optinTxn);
+        const encodedVoteTransaction = algosdk.encodeUnsignedTransaction(voteTxn);
+        const signedTransactions = await signTransactions([encodedOptinTransaction, encodedVoteTransaction])
+        const { id, txId, txn } = await sendTransactions(signedTransactions, waitRoundsToConfirm);
+        console.log('Successfully sent transaction. Transaction ID: ', txId)
+        openNotification("Vote proposal", `Vote proposal successful!`, MESSAGE_TYPE.SUCCESS, () => { })
+        getOnchainProposal(proposal.proposal_app_id);
+    } catch (e) {
+        console.log(e);
+        openNotification("Vote proposal", e.message, MESSAGE_TYPE.ERROR, () => { })
+    }
+    store.dispatch(updateProcessStatus({
+        actionName: actionNames.voteAction,
+        att: processKeys.processing,
+        value: false
+    }))
 }
 
 export const executeProposal = async (
     address: string,
-    proposalAddress: string,
     signTransactions: Function,
     sendTransactions: Function
 ) => {
-    // If use local state to check a member voted or not yet, need to a opt-in transaction
-    const suggestedParams = await algoClient.getTransactionParams().do();
-    const executeProposalMethodSelector = algosdk.getMethodByName(contract.methods, 'execute_proposal').getSelector();
-    const executeProposalTxn = algosdk.makeApplicationCallTxnFromObject({
-        from: address,
-        suggestedParams: suggestedParams,
-        appIndex: appId,
-        onComplete: algosdk.OnApplicationComplete.NoOpOC,
-        appArgs: [
-            executeProposalMethodSelector,
-            algosdk.encodeUint64(proposalId),
-            algosdk.encodeUint64(500_000),
-            (new ABIAddressType()).encode(proposalAddress)
-        ],
-        foreignApps: [proposalId],
-        accounts: [address]
-    });
+    try {
+        if (!address) {
+            openNotification("Your wallet is not currently connected.", `To utilize ALGOGREEN features, please connect your wallet.`, MESSAGE_TYPE.INFO, () => { });
+            return;
+        }
+        store.dispatch(updateProcessStatus({
+            actionName: actionNames.executeProposalAction,
+            att: processKeys.processing,
+            value: true
+        }))
+        const {proposal} = store.getState().proposal;
+        const {daoFromDB} = store.getState().daoDetail;
+        // If use local state to check a member voted or not yet, need to a opt-in transaction
+        const suggestedParams = await algoClient.getTransactionParams().do();
+        const executeProposalMethodSelector = algosdk.getMethodByName(contract.methods, 'execute_proposal').getSelector();
+        const executeProposalTxn = algosdk.makeApplicationCallTxnFromObject({
+            from: address,
+            suggestedParams: suggestedParams,
+            appIndex: daoFromDB.dao_app_id,
+            onComplete: algosdk.OnApplicationComplete.NoOpOC,
+            appArgs: [
+                executeProposalMethodSelector,
+                algosdk.encodeUint64(proposal.proposal_app_id),
+                algosdk.encodeUint64(proposal.borrow_amount * 10**6),
+                (new ABIAddressType()).encode(proposal.creator)
+            ],
+            foreignApps: [proposal.proposal_app_id],
+            accounts: [proposal.creator]
+        });
 
-    const encodedExecuteTransaction = algosdk.encodeUnsignedTransaction(executeProposalTxn)
-    const signedTransactions = await signTransactions([encodedExecuteTransaction])
-    const { id, txId, txn } = await sendTransactions(signedTransactions, waitRoundsToConfirm);
-    console.log('Successfully sent transaction. Transaction ID: ', txId)
+        const encodedExecuteTransaction = algosdk.encodeUnsignedTransaction(executeProposalTxn);
+        const signedTransactions = await signTransactions([encodedExecuteTransaction]);
+        const { id, txId, txn } = await sendTransactions(signedTransactions, waitRoundsToConfirm);
+
+        console.log('Successfully sent transaction. Transaction ID: ', txId);
+        // Update database
+        await fetch("/api/database/dao/update", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+            },
+            body: JSON.stringify({
+                _id: id,
+                executed: 1
+            })
+        })
+        // dispatch proposal detail
+        store.dispatch(setProposalState({att: "proposal", value: {...proposal, executed: 1}}))
+        openNotification("Execute proposal", `Execute proposal successful!`, MESSAGE_TYPE.SUCCESS, () => { });
+    } catch (e) {
+        console.log(e);
+        openNotification("Execute proposal", e.message, MESSAGE_TYPE.ERROR, () => { })
+    }
+    store.dispatch(updateProcessStatus({
+        actionName: actionNames.executeProposalAction,
+        att: processKeys.processing,
+        value: false
+    }))
 }
 
 export const repayProposal = async (

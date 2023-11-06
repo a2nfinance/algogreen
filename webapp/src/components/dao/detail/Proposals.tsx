@@ -1,14 +1,29 @@
 
-import { Button, Table, Tag } from "antd";
+import { Button, Modal, Table, Tag } from "antd";
 import { useRouter } from "next/router";
-import { useEffect } from "react";
-import { useAppSelector } from "src/controller/hooks";
-// import { getDaoProposals } from "src/core";
+import { useEffect, useState } from "react";
+import { ProposalDetail } from "src/components/proposal/ProposalDetail";
+import { useAppDispatch, useAppSelector } from "src/controller/hooks";
+import { setProposalState } from "src/controller/proposal/proposalSlice";
+import { getDAOProposals, getOnchainProposal } from "src/core/proposal";
 
 export const Proposals = () => {
-
+    const { daoProposals } = useAppSelector(state => state.proposal);
     const router = useRouter();
-    const { proposals, daoFromDB } = useAppSelector(state => state.daoDetail);
+    const dispatch = useAppDispatch();
+    const { id } = router.query;
+    const [newProposalModalOpen, setNewProposalModalOpen] = useState(false);
+    const showProposalModal = () => {
+        setNewProposalModalOpen(true);
+    };
+
+    const handleProposalModalOk = () => {
+        setNewProposalModalOpen(false);
+    };
+
+    const handleProposalModalCancel = () => {
+        setNewProposalModalOpen(false);
+    };
 
     const colorMap = (pt: number) => {
         let color = "blue";
@@ -27,45 +42,6 @@ export const Proposals = () => {
                 break;
         }
         return color;
-    }
-
-    const paymentTypeMap = (pt: number) => {
-        let ptype = "Instant payout"
-        if (!pt) return ptype;
-        switch (parseInt(pt.toString())) {
-            case 1:
-                ptype = "Payout"
-                break;
-            case 2:
-                ptype = "Add member";
-                break;
-            case 3:
-                ptype = "Remove member";
-                break
-            case 4:
-                ptype = "Add funder";
-                break
-            case 5:
-                ptype = "Remove funder";
-                break
-            case 6:
-                ptype = "Add whitelisted token";
-                break
-            case 7:
-                ptype = "Remove whitelisted token";
-                break
-            case 8:
-                ptype = "Pause DAO";
-                break
-            case 9:
-                ptype = "Custom";
-                break
-            default:
-                break;
-        }
-
-        return ptype;
-
     }
 
     const statusMap = (status: number) => {
@@ -96,10 +72,11 @@ export const Proposals = () => {
             key: 'title',
         },
         {
-            title: 'Type',
-            key: 'proposal_type',
+            title: "Created At",
+            dataIndex: "created_at",
+            key: "created_at",
             render: (_, record) => (
-                <Tag color={colorMap(record.proposalType)}>{paymentTypeMap(record.proposal_type)}</Tag>
+                new Date(record.created_at).toLocaleString()
             )
         },
         {
@@ -111,22 +88,14 @@ export const Proposals = () => {
             )
         },
         {
-            title: "Created At",
-            dataIndex: "created_at",
-            key: "created_at",
-            render: (_, record) => (
-                new Date(record.created_at).toLocaleString()
-            )
-        },
-        {
             title: 'Actions',
             key: 'actions',
             render: (_, record) => (
                 <Button type="primary" onClick={() => {
-                    //dispatch(setDaoDetailProps({att: "currentProposal", value: record}))
-                    // showDrawerDetail()
-                    router.push(`/proposal/${daoFromDB._id}/${record._id}`)
-
+                    console.log(record);
+                    dispatch(setProposalState({att: "proposal", value: record}));
+                    getOnchainProposal(record.proposal_app_id);
+                    showProposalModal();
                 }}>Detail</Button>
             )
 
@@ -134,22 +103,26 @@ export const Proposals = () => {
     ];
 
 
-    // useEffect(() => {
-    //     if (daoFromDB.dao_address) {
-    //         getDaoProposals(daoFromDB.dao_address);
-    //     }
+    useEffect(() => {
+        if (id) {
+            getDAOProposals(id.toString());
+        }
 
-    // }, [daoFromDB.dao_address])
+    }, [id])
 
     return (
-
-        <Table
-            pagination={{
-                pageSize: 20,
-                position: ["bottomCenter"]
-            }}
-            dataSource={proposals}
-            columns={columns} />
+        <>
+            <Table
+                pagination={{
+                    pageSize: 20,
+                    position: ["bottomCenter"]
+                }}
+                dataSource={daoProposals}
+                columns={columns} />
+                <Modal width={600} open={newProposalModalOpen} onCancel={handleProposalModalCancel} footer={null} >
+                    <ProposalDetail />
+                </Modal>
+        </>
 
     )
 }
