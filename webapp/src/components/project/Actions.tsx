@@ -4,14 +4,16 @@ import { useWallet } from "@txnlab/use-wallet";
 import { Alert, Button, Card, Divider, Form, Input, Modal, Space } from "antd"
 import { useRouter } from "next/router";
 import { useAppSelector } from "src/controller/hooks";
-import { useForm } from "antd/es/form/Form";
+import { newCredit } from 'src/core/credit';
+
 
 export const Actions = () => {
     const router = useRouter();
     const { activeAccount } = useWallet();
     const { project } = useAppSelector(state => state.project);
+    const { createCreditAction } = useAppSelector(state => state.process);
     const [newCreditsModalOpen, setNewCreditsModalOpen] = useState(false);
-    const [form] = useForm()
+    const [form] = Form.useForm()
     const showModal = () => {
         setNewCreditsModalOpen(true);
     };
@@ -25,7 +27,7 @@ export const Actions = () => {
     };
     const editorRef = useRef(null);
     const onFinish = (values: any) => {
-        // createProposal(activeAccount?.address, values, signTransactions, sendTransactions)
+        newCredit(activeAccount?.address, values);
     };
     return (
         <>
@@ -44,7 +46,7 @@ export const Actions = () => {
                         <Form.Item name={"title"} label="Title" rules={[{ required: true, message: 'Missing title' }]}>
                             <Input size='large' />
                         </Form.Item>
-                        <Form.Item name={"total_credits"} label="Total credits" rules={[{ required: true, message: 'Missing total credits' }]}>
+                        <Form.Item name={"total_credits"} label="Total credits (kilograms of carbon offset)" rules={[{ required: true, message: 'Missing total credits' }]}>
                             <Input size='large' type="number" />
                         </Form.Item>
                         <Form.Item name={"proof_document"} label="Proof document" rules={[{ required: true, message: 'Missing proof document', type: "url" }]}>
@@ -76,7 +78,7 @@ export const Actions = () => {
                             }}
                         />
                         <Divider />
-                        
+                        <Button loading={createCreditAction.processing} htmlType='submit' type='primary' size='large'>Submit</Button>
                     </Form>
                 </Card>
             </Modal>

@@ -8,6 +8,7 @@ import daoFormReducer from "./dao/daoFormSlice";
 import processReducer from './process/processSlice';
 import loanReducer from './loan/loanSlice';
 import proposalReducer from './proposal/proposalSlice';
+import creditReducer from './credit/creditSlice';
 
 export function makeStore() {
     return configureStore({
@@ -19,7 +20,8 @@ export function makeStore() {
             daoForm: daoFormReducer,
             process: processReducer,
             loan: loanReducer,
-            proposal: proposalReducer
+            proposal: proposalReducer,
+            credit: creditReducer
         },
         middleware: (getDefaultMiddleware) =>
             getDefaultMiddleware({

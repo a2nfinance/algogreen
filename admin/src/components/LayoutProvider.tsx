@@ -1,25 +1,22 @@
 import {
     AppstoreOutlined,
     BarChartOutlined,
-    GithubOutlined,
     HomeOutlined,
+    LogoutOutlined,
     MenuFoldOutlined,
     MenuUnfoldOutlined
 } from '@ant-design/icons';
 
-import { AiOutlineDashboard } from "react-icons/ai";
-import { FaSuperscript } from "react-icons/fa";
 import { GoProjectRoadmap } from "react-icons/go";
-import { GrDocumentTime } from "react-icons/gr";
-import { LiaDiscord } from "react-icons/lia";
-import { RiRefund2Line } from "react-icons/ri";
-
+import { SiCoinmarketcap } from "react-icons/si";
 
 import { Button, Form, Image, Layout, Menu, Space, theme } from 'antd';
+import { signOut, useSession } from 'next-auth/react';
 import { useRouter } from 'next/router';
 import React, { useState } from "react";
-// import AutoSearch from './common/AutoSearch';
-// import { ConnectButton } from './common/ConnectButton';
+import { LoginForm } from './LoginForm';
+import { ConnectButton } from './common/ConnectButton';
+
 const { Header, Sider, Content, Footer } = Layout;
 
 interface Props {
@@ -27,12 +24,12 @@ interface Props {
 }
 
 export const LayoutProvider = (props: Props) => {
+    const { data: session } = useSession()
     const [collapsed, setCollapsed] = useState(false);
     const router = useRouter();
     const {
         token: { colorBgContainer },
     } = theme.useToken();
-
     return (
         <Layout style={{ minHeight: '100vh' }}>
             <Sider width={250} onCollapse={() => setCollapsed(!collapsed)} collapsed={collapsed} style={{ background: colorBgContainer }}>
@@ -69,8 +66,8 @@ export const LayoutProvider = (props: Props) => {
                         {
                             key: '3.1',
                             icon: <BarChartOutlined />,
-                            label: "Statistics",
-                            onClick: () => router.push("/statistic")
+                            label: "Credits",
+                            onClick: () => router.push("/credit/list")
                         },
                         { type: "divider" },
                         {
@@ -78,23 +75,12 @@ export const LayoutProvider = (props: Props) => {
                             type: "group",
                             label: !collapsed ? 'Algogreen v0.0.1' : "",
                             children: [
-                                {
-                                    key: '11',
-                                    icon: <GithubOutlined />,
-                                    label: 'Github',
-                                    onClick: () => window.open("https://github.com/a2nfinance/neodao", "_blank")
-                                },
-                                {
-                                    key: '12',
-                                    icon: <FaSuperscript />,
-                                    label: 'Twitter',
-                                    onClick: () => window.open("https://twitter.com/NeoPay_A2N", "_blank")
-                                },
+
                                 {
                                     key: '13',
-                                    icon: <LiaDiscord />,
-                                    label: 'Discord',
-                                    onClick: () => window.open("https://discord.com/channels/1136151377626796061", "_blank")
+                                    icon: <SiCoinmarketcap />,
+                                    label: 'Marketplace',
+                                    onClick: () => window.open("https://marketplace-algogreen.a2n.finance", "_blank")
                                 },
                             ]
                         }
@@ -123,6 +109,13 @@ export const LayoutProvider = (props: Props) => {
                             </Form.Item>
                             <Form.Item>
                                 {/* <ConnectButton /> */}
+                                {
+                                    session && <Space>
+                                    <Button size='large' type='primary'>Welcome {session.user.name}!</Button>
+                                    <ConnectButton />
+                                    <Button size='large' onClick={() => signOut()} icon={<LogoutOutlined />}/>
+                                </Space>
+                                }
                             </Form.Item>
                         </Form>
                     </Space>
@@ -135,9 +128,12 @@ export const LayoutProvider = (props: Props) => {
                         background: colorBgContainer
                     }}
                 >
-                    {props.children}
+                    {
+                        session ? props.children : <LoginForm/>
+                    }
+                    
                 </Content>
-                <Footer style={{ textAlign: 'center', maxHeight: 50 }}>Algogreen - Carbon Credit Marketplace ©2023 Created by A2N Finance</Footer>
+                <Footer style={{ textAlign: 'center', maxHeight: 50 }}>Algogreen - Admin Control Panel ©2023 Created by A2N Finance</Footer>
             </Layout>
 
         </Layout>

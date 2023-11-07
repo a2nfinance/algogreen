@@ -1,5 +1,5 @@
 import { PayloadAction, createSlice } from "@reduxjs/toolkit";
-
+const placeholderDate = new Date().getTime();
 type ProjectItem = {
     _id: string,
     creator: string,
@@ -40,8 +40,8 @@ const initialState: state = {
         project_leader: "",
         contact_email: "",
         project_location: "",
-        start_date: new Date().getTime(),
-        end_date: new Date().getTime(),
+        start_date: null,
+        end_date: null,
         detail_document: "",
         video: "",
         twitter: "",
@@ -50,7 +50,7 @@ const initialState: state = {
         description: "",
         status: 0,
         is_eco_project: 1,
-        created_at:  new Date().toLocaleString(),
+        created_at:  null,
     }
 }
 

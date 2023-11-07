@@ -1,12 +1,7 @@
 import type { TabsProps } from 'antd';
 import { Tabs } from 'antd';
-import { ProposalList } from './ProposalList';
-import { RecievedLoan } from './RecievedLoan';
 import { CarbonCredits } from './CarbonCredits';
-// import { Members } from './Members';
-// import { Proposals } from './Proposals';
-// import { TreasuryInfo } from './TreasuryInfo';
-// import { OpenTasks } from './OpenTasks';
+import { Proposals } from './Proposals';
 
 export const ProjectTabs = () => {
 
@@ -14,7 +9,7 @@ export const ProjectTabs = () => {
         {
             key: '1',
             label: `Proposal`,
-            children:  <ProposalList />,
+            children:  <Proposals />,
         },
         {
             key: '4',

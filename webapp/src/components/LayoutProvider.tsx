@@ -1,21 +1,20 @@
 import {
     AppstoreOutlined,
     BarChartOutlined,
-    GithubOutlined,
     HomeOutlined,
     MenuFoldOutlined,
     MenuUnfoldOutlined
 } from '@ant-design/icons';
 
+import { Button, Form, Image, Layout, Menu, Space, theme } from 'antd';
+import { useRouter } from 'next/router';
 import { AiOutlineAppstoreAdd, AiOutlineFileAdd } from "react-icons/ai";
 import { FaSuperscript } from "react-icons/fa";
 import { GoProjectRoadmap } from "react-icons/go";
 import { GrDocumentTime } from "react-icons/gr";
-import { LiaDiscord } from "react-icons/lia";
 import { RiRefund2Line } from "react-icons/ri";
-import {TbBrandCarbon} from "react-icons/tb";
-import { Button, Form, Image, Layout, Menu, Space, theme } from 'antd';
-import { useRouter } from 'next/router';
+import { SiCoinmarketcap } from "react-icons/si";
+import { TbBrandCarbon } from "react-icons/tb";
 
 import React, { useState } from "react";
 import { ConnectButton } from './common/ConnectButton';
@@ -109,35 +108,6 @@ export const LayoutProvider = (props: Props) => {
                                     icon: <AiOutlineFileAdd />,
                                     onClick: () => router.push("/project/new")
                                 },
-                                // {
-                                //     key: '7',
-                                //     label: "Crypto Streaming",
-                                //     icon: <MdOutlineWaterDrop />,
-                                //     children: [
-                                //         {
-                                //             key: '7_1',
-                                //             label: "New Stream",
-                                //             onClick: () => router.push("/my-account/crypto-streaming/new")
-                                //         },
-                                //         {
-                                //             key: '7_2',
-                                //             label: "Outgoing",
-                                //             onClick: () => router.push("/my-account/crypto-streaming/outgoing")
-                                //         },
-                                //         {
-                                //             key: '7_3',
-                                //             label: "Incoming",
-                                //             onClick: () => router.push("/my-account/crypto-streaming/incoming")
-                                //         },
-                                //     ]
-
-                                // },
-                                // {
-                                //     key: '6',
-                                //     label: "Batch Payment",
-                                //     icon: <GrGroup />,
-                                //     onClick: () => router.push("/my-account/batch-payment")
-                                // },
                             ]
                         },
                         { type: "divider" },
@@ -147,12 +117,6 @@ export const LayoutProvider = (props: Props) => {
                             label: !collapsed ? 'Algogreen v0.0.1' : "",
                             children: [
                                 {
-                                    key: '11',
-                                    icon: <GithubOutlined />,
-                                    label: 'Github',
-                                    onClick: () => window.open("https://github.com/a2nfinance/neodao", "_blank")
-                                },
-                                {
                                     key: '12',
                                     icon: <FaSuperscript />,
                                     label: 'Twitter',
@@ -160,9 +124,9 @@ export const LayoutProvider = (props: Props) => {
                                 },
                                 {
                                     key: '13',
-                                    icon: <LiaDiscord />,
-                                    label: 'Discord',
-                                    onClick: () => window.open("https://discord.com/channels/1136151377626796061", "_blank")
+                                    icon: <SiCoinmarketcap />,
+                                    label: 'Marketplace',
+                                    onClick: () => window.open("https://marketplace-algogreen.a2n.finance", "_blank")
                                 },
                             ]
                         }

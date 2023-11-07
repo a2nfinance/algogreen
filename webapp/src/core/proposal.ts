@@ -1,7 +1,5 @@
 import { setProposalState } from "src/controller/proposal/proposalSlice";
 import { store } from "src/controller/store";
-import { algoClient } from "./constant";
-import algosdk from "algosdk";
 import { getAppInfo } from "./util";
 
 export const getDAOProposals = async (id: string) => {
@@ -47,6 +45,25 @@ export const getOnchainProposal = async (appId: number) => {
     try {
         let state = await getAppInfo(appId);
         store.dispatch(setProposalState({att: "onchainProposal", value: state}))
+    } catch(e) {
+        console.log(e)
+    }
+}
+
+export const getProjectProposals = async (id: string) => {
+    try {
+        let req = await fetch(`/api/database/proposal/getByProject`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+                project_id: id
+            })
+        });
+
+        const proposals = await req.json();
+        store.dispatch(setProposalState({att: "projectProposals", value: proposals}))
     } catch(e) {
         console.log(e)
     }

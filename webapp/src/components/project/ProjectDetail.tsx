@@ -22,8 +22,8 @@ export const ProjectDetail = () => {
             <Descriptions layout={"vertical"} column={3}>
                 <Descriptions.Item label={"Project leader"}>{project.project_leader}</Descriptions.Item>
                 <Descriptions.Item label={"Location"}>{project.project_location}</Descriptions.Item>
-                <Descriptions.Item label={"Start date"}>{new Date(project.start_date).toLocaleString()}</Descriptions.Item>
-                <Descriptions.Item label={"End date"}>{new Date(project.end_date).toLocaleString()}</Descriptions.Item>
+                <Descriptions.Item label={"Start date"}>{project.start_date ? new Date(project.start_date).toLocaleString() : ""}</Descriptions.Item>
+                <Descriptions.Item label={"End date"}>{project.end_date ? new Date(project.end_date).toLocaleString() : ""}</Descriptions.Item>
                 <Descriptions.Item label={"Carbon offset project"}>{project.is_eco_project ? "Yes" : "No"}</Descriptions.Item>
                 <Descriptions.Item label={"Status"}>
                     {

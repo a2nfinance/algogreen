@@ -26,7 +26,8 @@ type state = {
     myProposals: ProposalItem[],
     daoProposals: ProposalItem[],
     proposal: ProposalItem,
-    onchainProposal: any
+    onchainProposal: any,
+    projectProposals: ProposalItem[]
 }
 
 const initialState: state = {
@@ -54,7 +55,8 @@ const initialState: state = {
         is_repaid: 0
 
     },
-    onchainProposal: [{key: "agree_counter", value: 0}, {key: "disagree_counter", value: 0} ]
+    onchainProposal: [{key: "agree_counter", value: 0}, {key: "disagree_counter", value: 0} ],
+    projectProposals: []
 }
 
 export const proposalSlice = createSlice({

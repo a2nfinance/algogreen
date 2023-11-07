@@ -72,14 +72,6 @@ export const Proposals = () => {
             key: 'title',
         },
         {
-            title: "Created At",
-            dataIndex: "created_at",
-            key: "created_at",
-            render: (_, record) => (
-                new Date(record.created_at).toLocaleString()
-            )
-        },
-        {
             title: "Executed",
             dataIndex: "executed",
             key: "executed",
@@ -93,6 +85,14 @@ export const Proposals = () => {
             key: "is_repaid",
             render: (_, record) => (
                 <Tag color={colorMap(record.is_repaid)}>{record.is_repaid ? "Yes" : "Not yet"}</Tag>
+            )
+        },
+        {
+            title: "Created At",
+            dataIndex: "created_at",
+            key: "created_at",
+            render: (_, record) => (
+                new Date(record.created_at).toLocaleString()
             )
         },
         {

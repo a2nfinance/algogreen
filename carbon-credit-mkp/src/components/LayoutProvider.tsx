@@ -9,6 +9,7 @@ import {
 } from '@ant-design/icons';
 
 import { AiOutlineDashboard } from "react-icons/ai";
+import { SiCoinmarketcap } from "react-icons/si";
 import { FaSuperscript, FaRegAddressBook } from "react-icons/fa";
 import { GrDocumentTime, GrGroup } from "react-icons/gr";
 import { LiaDiscord } from "react-icons/lia";
@@ -18,6 +19,7 @@ import { MdOutlineWaterDrop } from "react-icons/md";
 import { Button, Form, Image, Layout, Menu, Space, theme } from 'antd';
 import { useRouter } from 'next/router';
 import React, { useState } from "react";
+import { ConnectButton } from './common/ConnectButton';
 // import AutoSearch from './common/AutoSearch';
 // import { ConnectButton } from './common/ConnectButton';
 const { Header, Sider, Content, Footer } = Layout;
@@ -55,64 +57,35 @@ export const LayoutProvider = (props: Props) => {
                             onClick: () => router.push("/")
                         },
                         {
-                            key: '3',
-                            icon: <BarChartOutlined />,
-                            label: "Statistics",
-                            onClick: () => router.push("/statistic")
+                            key: '5',
+                            label: "Projects",
+                            icon: <AiOutlineDashboard />,
+                            onClick: () => router.push("/my-account")
                         },
-                        { type: 'divider' },
                         {
-                            key: '4',
+                            key: '5.1',
+                            label: "Credits",
+                            icon: <GrDocumentTime />,
+                            onClick: () => router.push("/my-account/my-credits")
+                        },
+                        { type: "divider" },
+                        {
+                            key: "9",
                             type: "group",
-                            label: !collapsed ? 'My Account' : '',
+                            label: !collapsed ? 'Algogreen v0.0.1' : "",
                             children: [
                                 {
-                                    key: '5',
-                                    label: "Dashboard",
-                                    icon: <AiOutlineDashboard />,
-                                    onClick: () => router.push("/my-account")
+                                    key: '12',
+                                    icon: <FaSuperscript />,
+                                    label: 'Twitter',
+                                    onClick: () => window.open("https://twitter.com/Algogreen_A2N", "_blank")
                                 },
                                 {
-                                    key: '5.1',
-                                    label: "My Credits",
-                                    icon: <GrDocumentTime />,
-                                    onClick: () => router.push("/my-account/my-credits")
+                                    key: '13',
+                                    icon: <SiCoinmarketcap />,
+                                    label: 'Borrow ALGO',
+                                    onClick: () => window.open("https://defi-algogreen.a2n.finance", "_blank")
                                 },
-                                // {
-                                //     key: '5.2',
-                                //     label: "Address Book",
-                                //     icon: <FaRegAddressBook />,
-                                //     onClick: () => router.push("/my-account/address-book")
-                                // },
-                                // {
-                                //     key: '7',
-                                //     label: "Crypto Streaming",
-                                //     icon: <MdOutlineWaterDrop />,
-                                //     children: [
-                                //         {
-                                //             key: '7_1',
-                                //             label: "New Stream",
-                                //             onClick: () => router.push("/my-account/crypto-streaming/new")
-                                //         },
-                                //         {
-                                //             key: '7_2',
-                                //             label: "Outgoing",
-                                //             onClick: () => router.push("/my-account/crypto-streaming/outgoing")
-                                //         },
-                                //         {
-                                //             key: '7_3',
-                                //             label: "Incoming",
-                                //             onClick: () => router.push("/my-account/crypto-streaming/incoming")
-                                //         },
-                                //     ]
-
-                                // },
-                                // {
-                                //     key: '6',
-                                //     label: "Batch Payment",
-                                //     icon: <GrGroup />,
-                                //     onClick: () => router.push("/my-account/batch-payment")
-                                // },
                             ]
                         }
                     ]}
@@ -139,7 +112,7 @@ export const LayoutProvider = (props: Props) => {
                                 {/* <AutoSearch /> */}
                             </Form.Item>
                             <Form.Item>
-                                {/* <ConnectButton /> */}
+                                <ConnectButton />
                             </Form.Item>
                         </Form>
                     </Space>
