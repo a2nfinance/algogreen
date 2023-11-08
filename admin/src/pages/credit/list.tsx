@@ -1,13 +1,16 @@
+import { useWallet } from "@txnlab/use-wallet";
 import { Button, Card, Modal, Space, Table, Tag } from "antd";
 import { useRouter } from "next/router";
 import { useEffect, useState } from "react";
 import { CreditItem, setCreditState } from "src/controller/credit/creditSlice";
 import { useAppDispatch, useAppSelector } from "src/controller/hooks";
 import { getPendingCredits, updateCredit } from "src/core/credit";
+import { deployMkp } from "src/core/marketplace";
 
 
 
 export default function AllCredits() {
+    const {activeAccount, signTransactions, sendTransactions} = useWallet();
     const dispatch = useAppDispatch();
     const router = useRouter();
     const { allCredits } = useAppSelector(state => state.credit);
@@ -41,7 +44,7 @@ export default function AllCredits() {
     const handleApprove = (record: CreditItem) => {
         dispatch(setCreditState({ att: "credit", value: record }));
 
-        showModal();
+        deployMkp(activeAccount?.address, signTransactions, sendTransactions);
     }
     const handleReject = (record: CreditItem) => {
         dispatch(setCreditState({ att: "credit", value: record }));

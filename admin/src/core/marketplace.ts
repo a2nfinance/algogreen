@@ -1,10 +1,10 @@
-import algosdk, { ABIAddressType, ABIStringType } from "algosdk";
-import { algoClient, waitRoundsToConfirm } from "./constant";
+import algosdk, { ABIAddressType } from "algosdk";
+import { actionNames, processKeys, updateProcessStatus } from "src/controller/process/processSlice";
+import { store } from "src/controller/store";
+import { getPendingCredits } from "src/core/credit";
 import * as abi from '../../artifacts/marketplace/contract.json';
 import { MESSAGE_TYPE, openNotification } from "./common";
-import { store } from "src/controller/store";
-import { actionNames, processKeys, updateProcessStatus } from "src/controller/process/processSlice";
-import { getAllCredits } from "src/core/credit";
+import { algoClient, waitRoundsToConfirm } from "./constant";
 // @ts-ignore
 const contract = new algosdk.ABIContract(abi);
 
@@ -77,7 +77,7 @@ export const deployMkp = async (
             })
         });
         // 
-        getAllCredits();
+        getPendingCredits();
         // Noti
         openNotification("Approve credits", `Approve credits successful!`, MESSAGE_TYPE.SUCCESS, () => { })
     } catch (e) {

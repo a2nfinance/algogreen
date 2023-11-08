@@ -93,7 +93,7 @@ export const bootstrapMkp = async (
         openNotification("Sell credits", `Sell credits successful!`, MESSAGE_TYPE.SUCCESS, () => { })
     } catch (e) {
         console.log(e);
-        openNotification("Sell credits", e.message, MESSAGE_TYPE.SUCCESS, () => { })
+        openNotification("Sell credits", e.message, MESSAGE_TYPE.ERROR, () => { })
     }
     store.dispatch(updateProcessStatus({
         actionName: actionNames.sellCreditsAction,
