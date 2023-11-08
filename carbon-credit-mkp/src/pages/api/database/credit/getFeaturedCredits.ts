@@ -1,12 +1,10 @@
 import connect from 'src/database/connect';
 import { NextApiRequest, NextApiResponse } from 'next';
-import Project from 'src/database/models/project';
-
+import Credit from "src/database/models/credit";
 const handler = async (req: NextApiRequest, res: NextApiResponse) => {
-
     try {
-        let projects = await Project.find({ status: 1, is_eco_project: 1 }).limit(3).sort({ created_at: -1 });
-        return res.status(200).send(projects);
+        let credits = await Credit.find({ status: 4 }).limit(10).sort({ created_at: -1 });
+        return res.status(200).send(credits);
     } catch (error) {
         console.log(error)
         return res.status(500).send(error.message);

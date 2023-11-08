@@ -3,51 +3,10 @@ import { store } from "src/controller/store";
 import { MESSAGE_TYPE, openNotification } from "./common";
 import { actionNames, processKeys, updateProcessStatus } from "src/controller/process/processSlice";
 import { setProjectState } from "src/controller/project/projectSlice";
-import { setCreditState } from "src/controller/credit/creditSlice";
+import { setCreditAndProject, setCreditState } from "src/controller/credit/creditSlice";
+import { algoClient } from "./constant";
+import { getAccountInfo } from "./util";
 
-export const newCredit = async (address: string, formValues: FormInstance<any>) => {
-    try {
-        if (!address) {
-            openNotification("Your wallet is not currently connected.", `To utilize ALGOGREEN features, please connect your wallet.`, MESSAGE_TYPE.INFO, () => { });
-            return;
-        }
-        const {project} = store.getState().project;
-        if (address !== project.creator) {
-            openNotification("You are not project owner.", `To utilize ALGOGREEN features, please connect your wallet.`, MESSAGE_TYPE.INFO, () => { });
-            return;
-        }
-        store.dispatch(updateProcessStatus({
-            actionName: actionNames.createCreditAction,
-            att: processKeys.processing,
-            value: true
-        }))
-      
-        // save here
-        await fetch(`/api/database/credit/save`, {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json'
-            },
-            body: JSON.stringify({
-                ...formValues,
-                creator: address,
-                project_id: project._id
-            })
-        });
-        // Noti here
-        openNotification("New credit.", `Create new credit successful!`, MESSAGE_TYPE.SUCCESS, () => { });
-        // Reload my project
-        getProjectCredits(project._id);
-    } catch (e) {
-        console.log(e);
-        openNotification("New credit.", e.message, MESSAGE_TYPE.ERROR, () => { });
-    }
-    store.dispatch(updateProcessStatus({
-        actionName: actionNames.createCreditAction,
-        att: processKeys.processing,
-        value: false
-    }))
-}
 
 export const getProjectCredits = async (id: string) => {
     try {
@@ -91,30 +50,36 @@ export const getMyCredits = async (address: string) => {
     }
 }
 
-export const getMyApprovedCredits = async (address: string) => {
+export const getApprovedCredits = async () => {
     try {
-        if (!address) {
-            return;
-        }
-        let req = await fetch(`/api/database/credit/getMyApprovedCredits`, {
-            method: 'POST',
+        let req = await fetch(`/api/database/credit/getApprovedCredits`, {
+            method: 'GET',
             headers: {
                 'Content-Type': 'application/json'
-            },
-            body: JSON.stringify({
-                creator: address,
-            })
+            }
         });
         let credits = await req.json();
-        store.dispatch(setCreditState({ att: "myApprovedCredits", value: credits }));
+        store.dispatch(setCreditState({ att: "allCredits", value: credits }));
     } catch (e) {
         console.log(e);
         openNotification("Get my projects.", e.message, MESSAGE_TYPE.ERROR, () => { });
     }
 }
 
-export const getApprovedCredits = async () => {
-
+export const getFeaturedCredits = async () => {
+    try {
+        let req = await fetch(`/api/database/credit/getFeaturedCredits`, {
+            method: 'GET',
+            headers: {
+                'Content-Type': 'application/json'
+            }
+        });
+        let credits = await req.json();
+        store.dispatch(setCreditState({ att: "featuredCredits", value: credits }));
+    } catch (e) {
+        console.log(e);
+        openNotification("Get my projects.", e.message, MESSAGE_TYPE.ERROR, () => { });
+    }
 }
 
 export const getCreditById = async (id: string) => {
@@ -128,8 +93,9 @@ export const getCreditById = async (id: string) => {
                 _id: id,
             })
         });
-        let credit = await req.json();
-        store.dispatch(setProjectState({ att: "credit", value: credit }));
+        let data = await req.json();
+        let creditAppInfo = await getAccountInfo(data.credit.app_id);
+        store.dispatch(setCreditAndProject({...data, creditAppInfo: creditAppInfo}));
     } catch (e) {
         console.log(e);
         openNotification("Get my projects.", e.message, MESSAGE_TYPE.ERROR, () => { });

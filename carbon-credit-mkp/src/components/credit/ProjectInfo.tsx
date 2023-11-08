@@ -1,56 +1,54 @@
-import { CopyOutlined, LinkOutlined } from '@ant-design/icons';
-import { Button, Card, Descriptions, Space } from 'antd';
-// import { DetailItemSekeleton } from 'src/components/common/DetailItemSkeleton';
-// import { DAO } from 'src/controller/dao/daoSlice';
+import { LinkOutlined } from '@ant-design/icons';
+import { Card, Descriptions, Divider, Tag } from 'antd';
 import { useAppSelector } from 'src/controller/hooks';
-// import { daoTypeMap } from 'src/core/constant';
-// import { useAddress } from 'src/hooks/useAddress';
+
 import { headStyle } from 'src/theme/layout';
 
 
 export const ProjectInfo = () => {
-//   const { getShortAddress, getObjectExplorerURL } = useAddress();
-//   const { daoFromDB } = useAppSelector(state => state.daoDetail)
-
-const projectFromDB = {
-    title: "Test project",
-    project_type: "Eco",
-    description: "Eco project",
-    owner: "AAAAAAA",
-    twitter: "https://google.com",
-    github: "https://google.com",
-    discord: "https://google.com",
-    created_at: new Date()
-}
+  const { project } = useAppSelector(state => state.credit);
 
   return (
-    <Card title={projectFromDB.title} style={{ backgroundColor: "#f5f5f5" }} headStyle={headStyle}>
+    <Card title={`Project: ${project.project_name}`} style={{ backgroundColor: "#f5f5f5" }} headStyle={headStyle}>
 
-      <Descriptions layout={"vertical"} column={1}>
-        <Descriptions.Item label={"Type"}>{projectFromDB.project_type}</Descriptions.Item>
-        <Descriptions.Item label={"Description"}>{projectFromDB.description}</Descriptions.Item>
-        {/* <Descriptions.Item label={"Treasury"}>
-          <Space wrap>
-            <Button icon={<LinkOutlined />} onClick={() => window.open(getObjectExplorerURL(daoFromDB.treasury_address), "_blank")}>{getShortAddress(daoFromDB.treasury_address)}</Button>
-            <Button icon={<CopyOutlined />} onClick={() => navigator.clipboard.writeText(daoFromDB.treasury_address)}></Button>
-          </Space>
-        </Descriptions.Item> */}
-        {/* <Descriptions.Item label={"Quorum (%)"}>{daoFromDB.quorum}</Descriptions.Item>
-        <Descriptions.Item label={"Passing threshold (%)"}>{daoFromDB.passing_threshold}</Descriptions.Item> */}
-        <Descriptions.Item label={"Created date"}>{new Date(projectFromDB.created_at).toLocaleString()}</Descriptions.Item>
-        <Descriptions.Item label={"KYC"}>
-          {(projectFromDB.twitter || projectFromDB.github || projectFromDB.discord) ? <Space wrap direction='horizontal'>
-            {projectFromDB.twitter && <a key={`social-link-twitter`} target='_blank' href={projectFromDB.twitter}>Twitter</a>}
-            {projectFromDB.github && <a key={`social-link-github`} target='_blank' href={projectFromDB.github}>Github</a>}
-            {projectFromDB.discord && <a key={`social-link-discord`} target='_blank' href={projectFromDB.discord}>Discord</a>}
-          </Space> : <>No</>}
+      <Descriptions layout={"vertical"} column={3}>
+        <Descriptions.Item label={"Project leader"}>{project.project_leader}</Descriptions.Item>
+        <Descriptions.Item label={"Location"}>{project.project_location}</Descriptions.Item>
+        <Descriptions.Item label={"Start date"}>{project.start_date ? new Date(project.start_date).toLocaleString() : ""}</Descriptions.Item>
+        <Descriptions.Item label={"End date"}>{project.end_date ? new Date(project.end_date).toLocaleString() : ""}</Descriptions.Item>
+        <Descriptions.Item label={"Carbon offset project"}>{project.is_eco_project ? "Yes" : "No"}</Descriptions.Item>
+        <Descriptions.Item label={"Status"}>
+          {
+            (project.status === 0) && <Tag color='default'>not verified</Tag>
+          }
+          {
+            (project.status === 1) && <Tag color='green'>verified</Tag>
+          }
+          {
+            (project.status === 2) && <Tag color='red'>rejected</Tag>
+          }
         </Descriptions.Item>
       </Descriptions>
-      {/* <Space wrap>
-        {
-          dao.open && <Button type='primary' loading={join.processing} onClick={() => joinDao(wallet, dao.id)} ghost>Join</Button>
-        }
-      </Space> */}
+      <Divider />
+      <Descriptions column={3}>
+        <Descriptions.Item label={"Document"}>{project.detail_document ? <a href={project.detail_document} target='_blank'><LinkOutlined /></a> : "N/A"}</Descriptions.Item>
+        <Descriptions.Item label={"Video"}>{project.video ? <a href={project.video} target='_blank'><LinkOutlined /></a> : "N/A"}</Descriptions.Item>
+        <Descriptions.Item label={"Twitter"}>{project.twitter ? <a href={project.twitter} target='_blank'><LinkOutlined /></a> : "N/A"}</Descriptions.Item>
+        <Descriptions.Item label={"Telegram"}>{project.telegram ? <a href={project.telegram} target='_blank'><LinkOutlined /></a> : "N/A"}</Descriptions.Item>
+        <Descriptions.Item label={"Github"}>{project.github ? <a href={project.github} target='_blank'><LinkOutlined /></a> : "N/A"}</Descriptions.Item>
+      </Descriptions>
+      <Divider />
+      <Descriptions layout='vertical'>
+        <Descriptions.Item label={"Short description"}>{project.short_description}</Descriptions.Item>
+      </Descriptions>
+      <Divider />
+      <Descriptions layout='vertical'>
+        <Descriptions.Item label={"Description"}>
+          <div
+            dangerouslySetInnerHTML={{ __html: project.description }}
+          />
+        </Descriptions.Item>
+      </Descriptions>
     </Card>
   );
 }

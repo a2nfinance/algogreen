@@ -1,12 +1,14 @@
-import { Button, Card, Table, Tag } from "antd";
+import { Button, Table, Tag } from "antd";
 import { useRouter } from "next/router";
 import { useEffect } from "react";
 import { useAppSelector } from "src/controller/hooks";
-import { getFeaturedCredits } from "src/core/credit";
+import { getProjectCredits } from "src/core/credit";
 
-export const Credits = () => {
+export const CarbonCredits = () => {
     const router = useRouter();
-    const { featuredCredits } = useAppSelector(state => state.credit)
+    const { id } = router.query;
+    const { projectCredits } = useAppSelector(state => state.credit)
+ 
     const columns = [
         {
             title: 'TITLE',
@@ -59,22 +61,23 @@ export const Credits = () => {
         }
     ];
 
-    useEffect(() => {
 
-        getFeaturedCredits()
-    }, [])
+    useEffect(() => {
+        if (id) {
+            getProjectCredits(id.toString());
+        }
+
+    }, [id])
 
     return (
-        <Card title="New Selling Credits" style={{ border: "none" }}
-            headStyle={{ padding: 0, textTransform: "uppercase" }}
-            bodyStyle={{ paddingLeft: 0, paddingRight: 0 }}
-            extra={
-                <Button type="primary" onClick={() => router.push(`/credit/list`)}>More</Button>
-            }>
-            <Table
-                pagination={false}
-                dataSource={featuredCredits}
-                columns={columns} />
-        </Card >
+
+        <Table
+            pagination={{
+                pageSize: 6,
+                position: ["bottomCenter"]
+            }}
+            dataSource={projectCredits}
+            columns={columns} />
+
     )
 }

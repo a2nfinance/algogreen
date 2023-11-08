@@ -60,13 +60,13 @@ export const LayoutProvider = (props: Props) => {
                             key: '5',
                             label: "Projects",
                             icon: <AiOutlineDashboard />,
-                            onClick: () => router.push("/my-account")
+                            onClick: () => router.push("/project/list")
                         },
                         {
                             key: '5.1',
                             label: "Credits",
                             icon: <GrDocumentTime />,
-                            onClick: () => router.push("/my-account/my-credits")
+                            onClick: () => router.push("/credit/list")
                         },
                         { type: "divider" },
                         {

@@ -1,6 +1,6 @@
 import { PayloadAction, createSlice } from "@reduxjs/toolkit";
 
-type ProjectItem = {
+export type ProjectItem = {
     _id: string,
     creator: string,
     project_name: string,
@@ -24,12 +24,33 @@ type ProjectItem = {
 
 type state = {
     featuredProjects: ProjectItem[],
-    allProjects: ProjectItem[]
+    allProjects: ProjectItem[],
+    project: ProjectItem
 }
 
 const initialState: state = {
     featuredProjects: [],
-    allProjects: []
+    allProjects: [],
+    project: {
+        _id: "",
+        creator: "",
+        project_name: "",
+        short_description: "",
+        project_leader: "",
+        contact_email: "",
+        project_location: "",
+        start_date: null,
+        end_date: null,
+        detail_document: "",
+        video: "",
+        twitter: "",
+        telegram: "",
+        github: "",
+        description: "",
+        status: 0,
+        is_eco_project: 1,
+        created_at: null,
+    }
 }
 
 export const projectSlice = createSlice({

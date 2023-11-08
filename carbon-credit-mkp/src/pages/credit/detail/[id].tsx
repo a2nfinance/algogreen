@@ -1,18 +1,22 @@
-import { Col, Row } from "antd";
+import { Col, Divider, Row } from "antd";
 import { useRouter } from "next/router";
+import { useEffect } from "react";
 import { Detail } from "src/components/credit/Detail";
 import { ProjectInfo } from "src/components/credit/ProjectInfo";
+import { getCreditById } from "src/core/credit";
 
 export default function Id() {
     const { id } = useRouter().query;
+    useEffect(() => {
+        if (id) {
+            getCreditById(id.toString());
+        }
+    }, [id])
     return (
-        <Row gutter={16}>
-            <Col span={6}>
-                <ProjectInfo />
-            </Col>
-            <Col span={18}>
-                <Detail />
-            </Col>
-        </Row>
+        <>
+            <Detail />
+            <Divider/>
+            <ProjectInfo />
+        </>
     )
 }
