@@ -3,6 +3,7 @@ import { persistStore } from 'redux-persist';
 import projectReducer from "./project/projectSlice";
 import creditReducer from "./credit/creditSlice";
 import daoReducer from "./dao/daoSlice";
+import daoDetailReducer from "./dao/daoDetailSlice";
 import processReducer from "./process/processSlice";
 export function makeStore() {
     return configureStore({
@@ -10,7 +11,8 @@ export function makeStore() {
             project: projectReducer,
             credit: creditReducer,
             dao: daoReducer,
-            process: processReducer
+            process: processReducer,
+            daoDetail: daoDetailReducer
         },
         middleware: (getDefaultMiddleware) =>
             getDefaultMiddleware({

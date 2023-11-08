@@ -76,10 +76,8 @@ export const daoDetailSlice = createSlice({
     name: 'daoDetail',
     initialState: initialState,
     reducers: {
-        setDaoDetailProps: (state: DaoState, action: PayloadAction<{daoFromDB: any, appAccountInformation: any, onchainDAO: any}>) => {
-            state.daoFromDB = action.payload.daoFromDB;
-            state.appAccountInformation = action.payload.appAccountInformation;
-            state.onchainDAO = action.payload.onchainDAO;
+        setDaoDetailProps: (state: DaoState, action: PayloadAction<any>) => {
+            state.daoFromDB = action.payload;
         },
         setProposals: (state: DaoState, action: PayloadAction<any>) => {
             state.proposals = action.payload

@@ -13,7 +13,7 @@ import { headStyle } from 'src/theme/layout';
 export const TokenGovernance = () => {
     const dispatch = useAppDispatch();
     const { generalForm, tokenGovernanceForm } = useAppSelector(state => state.daoForm);
-    const {activeAccount, signTransactions, sendTransactions} = useWallet();
+    const { activeAccount, signTransactions, sendTransactions } = useWallet();
     const { initializeDaoAction } = useAppSelector(state => state.process);
     const [form] = Form.useForm();
     const onFinish = (values: any) => {
@@ -23,8 +23,8 @@ export const TokenGovernance = () => {
         } else {
             dispatch(updateDaoFormState(3));
         }
-       
-       
+
+
     };
 
     return (
@@ -57,10 +57,10 @@ export const TokenGovernance = () => {
                     </Row>
                 </Card>
                 <Divider />
-                <Alert type='success' message="Please ensure that the sum of the distributed percentages for the treasury and contributors equals 100%." showIcon={true} />
-                <Divider />
-
+                <p><strong>Token-based DAO:</strong> A fluid organization with a large number of members, which has its own governance token. This organization can conduct payment or governance-based voting with members' token holdings taken into account.</p>
             </Card>
+
+
         </Form>
     )
 }

@@ -52,8 +52,7 @@ export const VotingConfiguration = () => {
                         <Radio value={0}>Only Members</Radio>
                     </Radio.Group>
                 </Form.Item>
-                <p><strong>Membership DAO (Multisig):</strong> A small organization with a few committed members who are likely to remain. This organization can conduct payment or governance-based voting with members' weights taken into account.</p>
-                <p><strong>Token-based DAO:</strong> A fluid organization with a large number of members, which has its own governance token. This organization can conduct payment or governance-based voting with members' token holdings taken into account.</p>
+                
             </Card>
         </Form>
     )

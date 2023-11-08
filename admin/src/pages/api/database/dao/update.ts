@@ -6,12 +6,11 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
     if (req.method === 'POST') {
         // need to validate
         const {
-            creator,
             _id,
         } = req.body;
-        if (creator && _id) {
+        if (_id) {
             try {
-                await DAO.findOneAndUpdate({ creator: creator, _id: _id}, req.body);
+                await DAO.findOneAndUpdate({_id: _id}, req.body);
                 res.json({ success: true });
             } catch (error) {
                 console.log(error)

@@ -1,27 +1,21 @@
 import {
-    AppstoreAddOutlined,
-    AppstoreOutlined,
     BarChartOutlined,
-    GithubOutlined,
     HomeOutlined,
     MenuFoldOutlined,
     MenuUnfoldOutlined
 } from '@ant-design/icons';
 
-import { AiOutlineDashboard } from "react-icons/ai";
+import { FaSuperscript } from "react-icons/fa";
+import { GoProjectRoadmap } from "react-icons/go";
+import { GrDocumentTime } from "react-icons/gr";
 import { SiCoinmarketcap } from "react-icons/si";
-import { FaSuperscript, FaRegAddressBook } from "react-icons/fa";
-import { GrDocumentTime, GrGroup } from "react-icons/gr";
-import { LiaDiscord } from "react-icons/lia";
-import { MdOutlineWaterDrop } from "react-icons/md";
 
 
 import { Button, Form, Image, Layout, Menu, Space, theme } from 'antd';
 import { useRouter } from 'next/router';
 import React, { useState } from "react";
 import { ConnectButton } from './common/ConnectButton';
-// import AutoSearch from './common/AutoSearch';
-// import { ConnectButton } from './common/ConnectButton';
+
 const { Header, Sider, Content, Footer } = Layout;
 
 interface Props {
@@ -59,13 +53,13 @@ export const LayoutProvider = (props: Props) => {
                         {
                             key: '5',
                             label: "Projects",
-                            icon: <AiOutlineDashboard />,
+                            icon: <GoProjectRoadmap />,
                             onClick: () => router.push("/project/list")
                         },
                         {
                             key: '5.1',
                             label: "Credits",
-                            icon: <GrDocumentTime />,
+                            icon: <BarChartOutlined />,
                             onClick: () => router.push("/credit/list")
                         },
                         { type: "divider" },

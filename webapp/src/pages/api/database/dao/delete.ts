@@ -1,6 +1,6 @@
 import connect from 'src/database/connect';
 import { NextApiRequest, NextApiResponse } from 'next';
-import DAO from "src/database/models/DAO";
+import DAO from "src/database/models/dao";
 
 const handler = async (req: NextApiRequest, res: NextApiResponse) => {
     if (req.method === 'POST') {

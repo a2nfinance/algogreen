@@ -5,14 +5,14 @@ export default function Document() {
         <Html lang='en'>
             <Head>
                 <title>Algogreen - Admin</title>
-                <meta name="title" content="A multipurpose DAO tool for everyone on the NEO Blockchain with a focus on payment and governance." />
-                <meta name="description" content="NeoPay - A2N Finance"/>
+                <meta name="title" content="Algogreen - Admin" />
+                <meta name="description" content="Allow admins to approve DAOs, Projects, and Carbon credits."/>
                 <link rel="icon" type="image/x-icon" href="/favicon.ico" />
                 <link
                     rel="stylesheet"
                     href="https://cdnjs.cloudflare.com/ajax/libs/nprogress/0.2.0/nprogress.min.css"
                 />
-                <meta property="og:url" content="https://neopay.a2n.finance/"></meta>
+               <meta property="og:url" content="https://admin-algogreen.a2n.finance/"></meta>
             </Head>
             <body>
                 <Main />

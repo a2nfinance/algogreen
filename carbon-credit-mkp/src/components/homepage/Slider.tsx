@@ -6,7 +6,7 @@ export const Slider = () => {
             <Col span={24}>
                 <Carousel autoplay>
                     <div>
-                        <Image src="/banner/carbon-offset.jpg" />
+                        <Image preview={false} src="/banner/carbon-offset.jpg" />
                     </div>
                 </Carousel>
             </Col>

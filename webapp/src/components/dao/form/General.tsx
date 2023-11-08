@@ -31,6 +31,7 @@ export const General = ({ isNewForm }: { isNewForm: boolean }) => {
 
     useEffect(() => {
         if (id && activeAccount?.address) {
+            console.log("Here")
             getDAOByCreatorAndId(activeAccount?.address, id.toString(), form)
         }
 
