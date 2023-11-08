@@ -7,11 +7,10 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
         // need to validate
         const {
             _id,
-            creator
         } = req.body;
-        if (_id && creator) {
+        if (_id) {
             try {
-                await Project.findOneAndUpdate({_id: _id, creator: creator}, req.body);
+                await Project.findOneAndUpdate({_id: _id}, req.body);
                 res.json({ success: true });
             } catch (error) {
                 console.log(error)

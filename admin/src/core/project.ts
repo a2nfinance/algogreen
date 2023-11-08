@@ -1,105 +1,65 @@
 import { FormInstance } from "antd";
+import { setProjectState } from "src/controller/project/projectSlice";
 import { store } from "src/controller/store";
 import { MESSAGE_TYPE, openNotification } from "./common";
-import { actionNames, processKeys, updateProcessStatus } from "src/controller/process/processSlice";
-import { setProjectState } from "src/controller/project/projectSlice";
 
-export const newProject = async (address: string, formValues: FormInstance<any>) => {
-    let flag = false;
+
+export const updateProject = async (status: number) => {
     try {
-        if (!address) {
-            openNotification("Your wallet is not currently connected.", `To utilize ALGOGREEN features, please connect your wallet.`, MESSAGE_TYPE.INFO, () => { });
-            return flag;
-        }
-        store.dispatch(updateProcessStatus({
-            actionName: actionNames.createNewProjectAction,
-            att: processKeys.processing,
-            value: true
-        }))
-
-        // save here
-        await fetch(`/api/database/project/save`, {
+        const { project } = store.getState().project;
+        let req = await fetch(`/api/database/project/update`, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json'
             },
             body: JSON.stringify({
-                ...formValues,
-                creator: address,
-                start_date: new Date(formValues["date"][0]).getTime(),
-                end_date: new Date(formValues["date"][1]).getTime()
+                _id: project._id,
+                status: status
             })
         });
-        // Noti here
-        openNotification("New project.", `Create new project successful!`, MESSAGE_TYPE.SUCCESS, () => { });
-        // Reload my project
-        getMyProjects(address);
-        flag = true;
+        let prj = await req.json();
+        getPendingProjects();
+        openNotification("Update project", "Update project successful", MESSAGE_TYPE.SUCCESS, () => { });
     } catch (e) {
+        openNotification("Update project", e.message, MESSAGE_TYPE.ERROR, () => { });
         console.log(e);
-        openNotification("New project.", e.message, MESSAGE_TYPE.ERROR, () => { });
-        flag = false;
     }
-    store.dispatch(updateProcessStatus({
-        actionName: actionNames.createNewProjectAction,
-        att: processKeys.processing,
-        value: false
-    }))
-    return flag;
 }
 
-export const updateProject = async (address: string, formValues: FormInstance<any>) => {
-
-}
-
-export const getMyProjects = async (address: string) => {
+export const getFeaturedProjects = async () => {
     try {
-        if (!address) {
-            openNotification("Your wallet is not currently connected.", `To utilize ALGOGREEN features, please connect your wallet.`, MESSAGE_TYPE.INFO, () => { });
-            return;
-        }
-        let req = await fetch(`/api/database/project/getListByCreator`, {
+        let req = await fetch(`/api/database/project/getFeaturedProjects`, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json'
             },
             body: JSON.stringify({
-
-                creator: address,
+                status: 4,
             })
         });
         let projects = await req.json();
-        store.dispatch(setProjectState({ att: "myProjects", value: projects }));
+        store.dispatch(setProjectState({ att: "featuredProjects", value: projects }));
     } catch (e) {
         console.log(e);
         openNotification("Get my projects.", e.message, MESSAGE_TYPE.ERROR, () => { });
     }
 }
 
-export const getMyApprovedProjects = async (address: string) => {
+
+export const getPendingProjects = async () => {
     try {
-        if (!address) {
-            return;
-        }
-        let req = await fetch(`/api/database/project/getMyApprovedProjects`, {
-            method: 'POST',
+        let req = await fetch(`/api/database/project/getPendingProjects`, {
+            method: 'GET',
             headers: {
                 'Content-Type': 'application/json'
             },
-            body: JSON.stringify({
-                creator: address,
-            })
         });
         let projects = await req.json();
-        store.dispatch(setProjectState({ att: "myApprovedProjects", value: projects }));
+        store.dispatch(setProjectState({ att: "allProjects", value: projects }));
     } catch (e) {
         console.log(e);
-        openNotification("Get my projects.", e.message, MESSAGE_TYPE.ERROR, () => { });
+        openNotification("Get projects.", e.message, MESSAGE_TYPE.ERROR, () => { });
     }
-}
-
-export const getApprovedProjects = async () => {
-
 }
 
 export const getProjectById = async (id: string) => {

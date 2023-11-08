@@ -1,6 +1,6 @@
 import { PayloadAction, createSlice } from "@reduxjs/toolkit";
-const placeholderDate = new Date().getTime();
-type ProjectItem = {
+
+export type ProjectItem = {
     _id: string,
     creator: string,
     project_name: string,
@@ -21,17 +21,16 @@ type ProjectItem = {
     created_at: string
 }
 
+
 type state = {
-    myProjects: ProjectItem[],
-    myApprovedProjects: ProjectItem[],
-    allApprovedProjects: ProjectItem[],
+    featuredProjects: ProjectItem[],
+    allProjects: ProjectItem[],
     project: ProjectItem
 }
 
 const initialState: state = {
-    myProjects: [],
-    myApprovedProjects: [],
-    allApprovedProjects: [],
+    featuredProjects: [],
+    allProjects: [],
     project: {
         _id: "",
         creator: "",
@@ -50,7 +49,7 @@ const initialState: state = {
         description: "",
         status: 0,
         is_eco_project: 1,
-        created_at:  null,
+        created_at: null,
     }
 }
 
@@ -60,7 +59,7 @@ export const projectSlice = createSlice({
     reducers: {
         setProjectState: (state: state, action: PayloadAction<{ att: string, value: any }>) => {
             state[action.payload.att] = action.payload.value
-        },
+        }
     }
 })
 
