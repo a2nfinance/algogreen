@@ -1,11 +1,7 @@
-import { EditOutlined, EllipsisOutlined, SettingOutlined } from "@ant-design/icons";
-import { Avatar, Button, Card, Col, Divider, Image, Row, Space } from "antd";
-import { useEffect } from "react";
+import { Button, Card, Col, Image, Row } from "antd";
 
 import { Typography } from 'antd';
 import { useRouter } from "next/router";
-import { ConnectMenu } from "src/components/common/ConnectMenu";
-import { TestCore } from "src/components/common/TestCore";
 
 const { Title, Text } = Typography;
 const { Meta } = Card;
@@ -34,10 +30,6 @@ export default function Index() {
                             <Button type="primary" size="large">All projects</Button>,
                         ]}
                     >
-                        {/* <Meta
-                            title="Step 01: Create your project"
-                        //   description="This is the description"
-                        /> */}
                     </Card>
 
                 </Col>
