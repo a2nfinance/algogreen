@@ -11,6 +11,7 @@ import { deployMkp } from "src/core/marketplace";
 
 export default function AllCredits() {
     const {activeAccount, signTransactions, sendTransactions} = useWallet();
+    const {deployMkpAction, changeStatusAction} = useAppSelector(state => state.process);
     const dispatch = useAppDispatch();
     const router = useRouter();
     const { allCredits } = useAppSelector(state => state.credit);
@@ -44,7 +45,7 @@ export default function AllCredits() {
     const handleApprove = (record: CreditItem) => {
         dispatch(setCreditState({ att: "credit", value: record }));
 
-        deployMkp(activeAccount?.address, signTransactions, sendTransactions);
+        showModal();
     }
     const handleReject = (record: CreditItem) => {
         dispatch(setCreditState({ att: "credit", value: record }));
@@ -119,8 +120,8 @@ export default function AllCredits() {
             key: "action",
             render: (_, record) => (
                 <Space>
-                    <Button type="primary" onClick={() => handleApprove(record)}>Approve</Button>
-                    <Button onClick={() => handleReject(record)}>Reject</Button>
+                    <Button loading={deployMkpAction.processing || changeStatusAction.processing} type="primary" onClick={() => handleApprove(record)}>Approve</Button>
+                    <Button  loading={deployMkpAction.processing || changeStatusAction.processing} onClick={() => handleReject(record)}>Reject</Button>
                 </Space>
             )
         }
@@ -141,11 +142,11 @@ export default function AllCredits() {
                 columns={columns} />
             <Modal title="Approve" open={approveModal} onCancel={handleModalCancel} footer={null} >
                 <p>Do you want to approve this request?</p>
-                <Button type="primary" size="large" onClick={() => updateCredit(2)}>Yes</Button>
+                <Button loading={deployMkpAction.processing} type="primary" size="large" onClick={() => deployMkp(activeAccount?.address, signTransactions, sendTransactions)}>Yes</Button>
             </Modal>
             <Modal title="Reject" open={rejectModal} onCancel={handleRejectModalCancel} footer={null} >
                 <p>Do you want to reject this request?</p>
-                <Button  type="primary" size="large" onClick={() => updateCredit(3)}>Yes</Button>
+                <Button loading={changeStatusAction.processing}  type="primary" size="large" onClick={() => updateCredit(3)}>Yes</Button>
             </Modal>
         </Card >
     )
