@@ -93,7 +93,10 @@ export const daoDetailSlice = createSlice({
         setLoans: (state: DaoState, action: PayloadAction<any[]>) => {
             state.loans = action.payload;
         },
+        setDAOFromDB: (state: DaoState, action: PayloadAction<any>) => {
+            state.daoFromDB = action.payload;
+        },
     }
 })
-export const { setDaoDetailProps, setProposals, setMembers, setAppAccountInformation, setLoans } = daoDetailSlice.actions;
+export const { setDaoDetailProps, setProposals, setMembers, setAppAccountInformation, setLoans, setDAOFromDB } = daoDetailSlice.actions;
 export default daoDetailSlice.reducer;

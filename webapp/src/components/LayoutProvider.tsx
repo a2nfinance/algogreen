@@ -72,12 +72,6 @@ export const LayoutProvider = (props: Props) => {
                             label: "Loans",
                             onClick: () => router.push("/loan/list")
                         },
-                        {
-                            key: '3.1',
-                            icon: <BarChartOutlined />,
-                            label: "Statistics",
-                            onClick: () => router.push("/statistic")
-                        },
                         { type: 'divider' },
                         {
                             key: '4',
@@ -85,16 +79,16 @@ export const LayoutProvider = (props: Props) => {
                             label: !collapsed ? 'My Account' : '',
                             children: [
                                 {
+                                    key: '5',
+                                    icon: <AppstoreOutlined />,
+                                    label: "My DAOs",
+                                    onClick: () => router.push("/my-account/my-daos")
+                                },
+                                {
                                     key: '5.1',
                                     label: "My Projects",
                                     icon: <GrDocumentTime />,
                                     onClick: () => router.push("/my-account/my-projects")
-                                },
-                                {
-                                    key: '5.2',
-                                    label: "Carbon credits",
-                                    icon: <TbBrandCarbon />,
-                                    onClick: () => router.push("/my-account/carbon-credits")
                                 },
                                 {
                                     key: '5.3',
@@ -169,7 +163,7 @@ export const LayoutProvider = (props: Props) => {
                 >
                     {props.children}
                 </Content>
-                <Footer style={{ textAlign: 'center', maxHeight: 50 }}>Algogreen - Carbon Credit Marketplace ©2023 Created by A2N Finance</Footer>
+                <Footer style={{ textAlign: 'center', maxHeight: 50 }}>Algogreen - DeFi ©2023 Created by A2N Finance</Footer>
             </Layout>
 
         </Layout>

@@ -5,12 +5,12 @@ import DAO from "src/database/models/DAO";
 const handler = async (req: NextApiRequest, res: NextApiResponse) => {
     if (req.method === 'POST') {
         const {
-            owner
+            creator
         } = req.body;
-        if (owner) {
+        if (creator) {
         
             try {
-                let daos = await DAO.find({owner: owner}).sort({created_at: -1});
+                let daos = await DAO.find({creator: creator}).sort({created_at: -1});
                 return res.status(200).send(daos);
             } catch (error) {
                 console.log(error)

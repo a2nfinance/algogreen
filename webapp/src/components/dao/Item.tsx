@@ -1,37 +1,36 @@
-import { Button, Card, Descriptions, Space } from 'antd';
-// import { joinDao } from 'src/core';
-import { CopyOutlined, LinkOutlined } from '@ant-design/icons';
+import { Button, Card, Descriptions, Divider, Space, Tag } from 'antd';
 import { useRouter } from 'next/router';
-// import { daoTypeMap } from 'src/core/constant';
-// import { useAddress } from 'src/hooks/useAddress';
+import { useAppDispatch } from 'src/controller/hooks';
 import { headStyle } from 'src/theme/layout';
 
-export const Item = ({ index, dao }) => {
+export const Item = ({ index, daoFromDB }) => {
+  const dispatch = useAppDispatch();
   const router = useRouter();
-//   const { getShortAddress, getObjectExplorerURL, editDaoLinkWithStatus } = useAddress();
-
   return (
-    <Card key={`dao-${index}`} title={dao.title}
-      extra={
-        <Button type='primary' onClick={() => router.push(`/dao/detail/${dao.id}`)}>View Detail</Button>
-      }
-      style={{ margin: 5, backgroundColor: "#f5f5f5" }}
-      headStyle={headStyle}>
+    <Card key={`dao-${index}`} title={daoFromDB.organization_name}  headStyle={headStyle} style={{ margin: 5, backgroundColor: "#f5f5f5" }} extra={
+      <Space>
+            {daoFromDB.status === 3 ? <Button type='primary' onClick={() => router.push(`/dao/detail/${daoFromDB._id}`)}>View details</Button> 
+            : <Button type='primary' onClick={() => router.push(`/dao/edit/${daoFromDB._id}`)}>Edit</Button>
+            }
+      </Space>
+     
+    }>
+      <Descriptions title={"Organization"} layout={"vertical"} column={2}>
+        <Descriptions.Item label={"Owner"}>{daoFromDB.owner}</Descriptions.Item>
 
-      <Descriptions layout={"vertical"} column={2}>
-
-        {/* <Descriptions.Item label={"Type"}>{daoTypeMap[dao.dao_type]}</Descriptions.Item> */}
-        {/* <Descriptions.Item label={"Open"}>{dao.submission_policy === 1 ? "No (Invited members only)" : "Yes (Open to all)" }</Descriptions.Item> */}
-        <Descriptions.Item label={"Description"}>{dao.description}</Descriptions.Item>
-        <Descriptions.Item label={"Status"}>{dao.status}</Descriptions.Item>
-        {/* <Descriptions.Item label={"Address"}>
-          <Space wrap>
-            <Button icon={<LinkOutlined />} onClick={() => window.open(getObjectExplorerURL(dao.dao_address), "_blank")}>{getShortAddress(dao.dao_address)}</Button>
-            <Button icon={<CopyOutlined />} onClick={() => navigator.clipboard.writeText(dao.dao_address)}></Button>
-          </Space>
-        </Descriptions.Item> */}
-       
+        <Descriptions.Item label={"City"}>{daoFromDB.city ? daoFromDB.city : "N/A"}</Descriptions.Item>
+        <Descriptions.Item label={"State"}>{daoFromDB.state ? daoFromDB.state : "N/A"}</Descriptions.Item>
+        <Descriptions.Item label={"Zipcode"}>{daoFromDB.zipcode ? daoFromDB.zipcode : "N/A"}</Descriptions.Item>
+        <Descriptions.Item label={"Country"}>{daoFromDB.country ? daoFromDB.country : "N/A"}</Descriptions.Item>
+        <Descriptions.Item label={"Email"}>{daoFromDB.email}</Descriptions.Item>
+        <Descriptions.Item label={"Phone number"}>{daoFromDB.phone_number}</Descriptions.Item>
+        <Descriptions.Item label={"Status"}><Tag color="green">Verified</Tag></Descriptions.Item>
       </Descriptions>
+      <Divider />
+      <Descriptions layout={"vertical"} column={1}>
+        <Descriptions.Item label={"Address"}>{daoFromDB.address}</Descriptions.Item>
+      </Descriptions>
+      <Divider />
     </Card>
   );
 }

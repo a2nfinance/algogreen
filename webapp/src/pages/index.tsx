@@ -1,14 +1,11 @@
 import { EditOutlined, EllipsisOutlined, SettingOutlined } from "@ant-design/icons";
-import { Avatar, Button, Card, Col, Row, Space } from "antd";
+import { Avatar, Button, Card, Col, Divider, Image, Row, Space } from "antd";
 import { useEffect } from "react";
 
 import { Typography } from 'antd';
 import { useRouter } from "next/router";
 import { ConnectMenu } from "src/components/common/ConnectMenu";
 import { TestCore } from "src/components/common/TestCore";
-// import { FeaturedProjects } from "src/components/project/FeaturedProjects";
-// import { List } from "src/components/credit/List";
-// import { FeatureImageSlides } from "src/components/home/FeatureImageSlides";
 
 const { Title, Text } = Typography;
 const { Meta } = Card;
@@ -17,71 +14,101 @@ export default function Index() {
     const router = useRouter();
 
     return (
-        <div style={{ maxWidth: 1440, margin: "auto", padding: 10 }}>
-            {/* <div style={{ textAlign: "center", maxWidth: 600, margin: "auto" }}>
-                <Text style={{ color: "blue" }} strong>OUR BEST FEATURES &#128293;</Text >
-                <Title level={2} style={{ fontWeight: 700 }}>Your Multipurpose DAO Solution on the NEO Blockchain for Payments and Governance.</Title>
+        <div style={{ maxWidth: 1000, margin: "auto", padding: 10 }}>
+            <div style={{ margin: "auto", width: 800, marginBottom: 10 }}>
+                <Image src="/intro/green-project.png" preview={false} />
             </div>
-            <br /> */}
-            <Row gutter={16}>
+            <Row gutter={8}>
+                <Col span={8}>
+                    <Card
+                        title={"Step 01: Create your project"}
+                        cover={
+                            <img
+                                height={200}
+                                alt="example"
+                                src="/intro/green-project.jpg"
+                            />
+                        }
+                        actions={[
+                            <Button type="primary" size="large">New project</Button>,
+                            <Button type="primary" size="large">All projects</Button>,
+                        ]}
+                    >
+                        {/* <Meta
+                            title="Step 01: Create your project"
+                        //   description="This is the description"
+                        /> */}
+                    </Card>
 
-                {/* <Col span={8}>
-                    <Card
+                </Col>
+                <Col span={8}>
+                    <Card title={"Step 02: Apply a loan"}
                         cover={
-                            <FeatureImageSlides key={"dao-slides"} imageUrls={["/DAO.png", "/PROPOSAL.png"]} />
+                            <img
+                                height={200}
+                                alt="example"
+                                src="/intro/apply-loan.jpg"
+                            />
                         }
                         actions={[
-                            <Button size="large" type="primary" onClick={() => router.push("/dao/list")}>VIEW MORE</Button>,
-                            <Button size="large" onClick={() => router.push("/dao/new")}>NEW DAO</Button>
+                            <Button type="primary" size="large">All DAOs</Button>,
+                            <Button type="primary" size="large">All loans</Button>,
                         ]}
                     >
-                        <Meta
-                            style={{ minHeight: 140 }}
-                            title={<Text strong style={{ fontSize: 18 }}>Multisig DAO</Text>}
-                            description="A small organization with a few committed members who are likely to remain. This organization can conduct payment or governance-based voting with members' weights taken into account."
-                        />
+
+
                     </Card>
                 </Col>
                 <Col span={8}>
-                    <Card
+                    <Card title={"Step 03: Sell carbon credits"}
                         cover={
-                            <FeatureImageSlides key={"stream-slides"} imageUrls={["/TOKEN_BASED_DAO.png", "/VOTING.png"]} />
+                            <img
+                                height={200}
+                                alt="example"
+                                src="/intro/carbon-credit.jpg"
+                            />
                         }
                         actions={[
-                            <Button size="large" type="primary" onClick={() => router.push("/my-account/crypto-streaming/outgoing")}>VIEW MORE</Button>,
-                            <Button size="large" onClick={() => router.push("/dao/new")}>NEW DAO</Button>
+                            <Button type="primary" size="large">My projects</Button>,
+                            <Button type="primary" size="large">Marketplace</Button>,
                         ]}
                     >
-                        <Meta
-                            style={{ minHeight: 140 }}
-                            title={<Text strong style={{ fontSize: 18 }}>Token-based DAO</Text>}
-                            description="A fluid organization with a large number of members, which has its own governance token. This organization can conduct payment or governance-based voting with members' token holdings taken into account."
-                        />
+
                     </Card>
                 </Col>
-                <Col span={8}>
-                    <Card
-                        cover={
-                            <FeatureImageSlides key={"channel-slides"} imageUrls={["/MY_PROPOSALS.png", "/BATCH_PAYMENTS.png"]} />
-                        }
-                        actions={[
-                            <Button size="large" type="primary" onClick={() => router.push("/my-account")}>VIEW MORE</Button>,
-                            <Button size="large" onClick={() => router.push("/my-account/batch-payment")}>BATCH PAYMENTS</Button>
-                        ]}
-                    >
-                        <Meta
-                            style={{ minHeight: 140 }}
-                            title={<Text strong style={{ fontSize: 18 }}>Account Management</Text>}
-                            description="Account Management allows users to manage their DAO and proposals. This feature also supports some experimental payment solutions, such as crypto streaming or batch payments."
-                        />
-                    </Card>
-                </Col> */}
             </Row>
-{/* 
-            <FeaturedProjects />
-            <List /> */}
-            <TestCore />
-            {/* <ConnectMenu /> */}
+
+            {/* <Space direction="vertical">
+                <Text>
+                    1. 92% of consumers say they’re more likely to trust brands that are environmentally or socially conscious. – Forbes
+                </Text>
+                <Text>
+                    2. 88% of consumers will be more loyal to a company that supports social or environmental issues. – Forbes
+                </Text>
+                <Text>
+
+                    3. 87% of consumers would buy a product with a social and environmental benefit if given the opportunity. – Forbes
+                </Text>
+                <Text>
+                    4. Overall sales revenue can increase up to 20% due to corporate responsibility practices. – Harvard Business Review
+                </Text>
+                <Text>
+                    5. 64% of millennials are willing to turn down a job if the company doesn’t have strong corporate responsibility. – Cone Communications
+                </Text>
+                <Text>
+                    6. 66% of global consumers are willing to pay more for sustainable goods. – INC.
+                </Text>
+                <Text>
+                    7. 38% of employees are more likely to be loyal to a company that prioritizes sustainability. – SHRM
+                </Text>
+                <Text>
+                    8. Employees at eco-friendly companies are 16% more productive than average. – UCLA Newsroom
+                </Text>
+                <Text>
+                    9. For every $1 saved on your utility bill from rooftop solar, your property value goes up $20. – National Renewable Energy Laboratory (NREL)
+                </Text>
+            </Space> */}
+
         </div>
     )
 }

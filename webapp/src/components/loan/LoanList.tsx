@@ -1,26 +1,47 @@
 
-import { Button, Table, Tag } from "antd";
+import { useState } from "react";
+import { Button, Card, Form, Input, Modal, Space, Table, Tag } from "antd";
 import { useRouter } from "next/router";
 import { useEffect } from "react";
-import { useAppSelector } from "src/controller/hooks";
+import { useAppDispatch, useAppSelector } from "src/controller/hooks";
+import { getAllLoans, getLoansList } from "src/core/loan";
+import { LoanDetail } from "src/components/loan/LoanDetail";
+import { setCurrentLoan } from "src/controller/loan/loanSlice";
+import { NewProposal } from "src/components/loan/NewProposal";
+import { getDAOByCreatorAndId, getDAODetailById } from "src/core/dao";
 
 export const LoanList = () => {
 
     const router = useRouter();
-    // const { proposals, daoFromDB } = useAppSelector(state => state.daoDetail);
-    const creditList = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10].map(m => ({
-        id: m,
-        title: `Title ${m}`,
-        created_at: `${m}`,
-        status: `status ${m}`,
-        dao_id: `DAO ${m}`,
-        general_rate: `Rate ${m}`,
-        special_rate: `SR ${m}`,
-        start_date: `std ${m}`,
-        end_date: `ed ${m}`,
-        amount: 10
-    }));
+    const dispatch = useAppDispatch();
+    const { allLoans } = useAppSelector(state => state.loan);
+    const [newLoanModalOpen, setNewLoanModalOpen] = useState(false);
+    const [newProposalModalOpen, setNewProposalModalOpen] = useState(false);
+    const showLoanModal = () => {
+        setNewLoanModalOpen(true);
+    };
 
+    const handleLoanModalOk = () => {
+        setNewLoanModalOpen(false);
+    };
+
+    const handleLoanModalCancel = () => {
+        setNewLoanModalOpen(false);
+    };
+
+
+
+    const showProposalModal = () => {
+        setNewProposalModalOpen(true);
+    };
+
+    const handleProposalModalOk = () => {
+        setNewProposalModalOpen(false);
+    };
+
+    const handleProposalModalCancel = () => {
+        setNewProposalModalOpen(false);
+    };
     const columns = [
         {
             title: 'Title',
@@ -28,95 +49,83 @@ export const LoanList = () => {
             key: 'title',
         },
         {
-            title: "Status",
-            dataIndex: "status",
-            key: "status",
-            // render: (_, record) => (
-            //     <Tag color={colorMap(record.executed ? 2 : record.status)}>{statusMap(record.executed ? 2 : record.status)}</Tag>
-            // )
+            title: "DAO",
+            dataIndex: 'dao_id',
+            key: 'dao_id',
+            render: (_, record) => (
+                <Button type="primary" onClick={() => router.push(`/dao/detail/${record.dao_id}`)}>view</Button>
+            )
         },
         {
-            title: "Limited amount (ALG)",
-            dataIndex: "amount",
-            key: "amount",
-            // render: (_, record) => (
-            //     new Date(record.created_at).toLocaleString()
-            // )
+            title: "Maximum borrow amount (ALGO)",
+            dataIndex: "maximum_borrow_amount",
+            key: "maximum_borrow_amount",
         },
         {
             title: "General rate",
-            dataIndex: "general_rate",
-            key: "general_rate",
+            dataIndex: "general_interest_rate",
+            key: "general_interest_rate",
         },
         {
             title: "Special rate",
-            dataIndex: "special_rate",
-            key: "special_rate",
+            dataIndex: "special_interest_rate",
+            key: "special_interest_rate",
         },
         {
-            title: "DAO",
-            dataIndex: "dao_id",
-            key: "dao_id",
-            // render: (_, record) => (
-            //     new Date(record.created_at).toLocaleString()
-            // )
-        },
-        {
-            title: "Created at",
-            dataIndex: "created_at",
-            key: "created_at",
-            // render: (_, record) => (
-            //     new Date(record.created_at).toLocaleString()
-            // )
-        },
-        {
-            title: "Start date",
-            dataIndex: "start_date",
-            key: "start_date",
-            // render: (_, record) => (
-            //     new Date(record.created_at).toLocaleString()
-            // )
-        },
-        {
-            title: "End date",
-            dataIndex: "end_date",
-            key: "end_date",
-            // render: (_, record) => (
-            //     new Date(record.created_at).toLocaleString()
-            // )
+            title: "Status",
+            dataIndex: "status",
+            key: "status",
+            render: (_, record) => (
+                <Tag>{record.status === 1 ? "active" : "inactive"}</Tag>
+            )
         },
         {
             title: 'Actions',
             key: 'actions',
             render: (_, record) => (
-                <Button type="primary" onClick={() => {
-                    //dispatch(setDaoDetailProps({att: "currentProposal", value: record}))
-                    // showDrawerDetail()
-                    router.push(`/loan/detail/${record.id}`)
+                <Space>
 
-                }}>Detail</Button>
+                    <Button type="primary" onClick={() => {
+                        dispatch(setCurrentLoan(record))
+                        showLoanModal()
+                    }}>Detail</Button>
+                    <Button type="primary" onClick={() => {
+                        dispatch(setCurrentLoan(record));
+                        getDAODetailById(record.dao_id);
+                        showProposalModal()
+                    }}>Apply</Button>
+
+                </Space>
+
             )
 
         },
     ];
 
 
-    // useEffect(() => {
-    //     if (daoFromDB.dao_address) {
-    //         getDaoProposals(daoFromDB.dao_address);
-    //     }
+    useEffect(() => {
 
-    // }, [daoFromDB.dao_address])
+        getAllLoans()
+
+
+    }, [])
 
     return (
-
-        <Table
-            pagination={{
-                pageSize: 6,
-                position: ["bottomCenter"]
-            }}
-            dataSource={creditList}
-            columns={columns} />
+        <>
+            <Table
+                pagination={{
+                    pageSize: 20,
+                    position: ["bottomCenter"]
+                }}
+                dataSource={allLoans}
+                columns={columns} />
+            <Modal width={600} open={newLoanModalOpen} onOk={handleLoanModalOk} onCancel={handleLoanModalCancel} footer={null}>
+                <LoanDetail />
+            </Modal>
+            <Modal width={600} open={newProposalModalOpen} onCancel={handleProposalModalCancel} footer={null}>
+                <NewProposal />
+            </Modal>
+        </>
 
     )
 }

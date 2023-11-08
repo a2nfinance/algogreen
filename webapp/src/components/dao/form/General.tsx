@@ -11,28 +11,30 @@ import { useEffect } from "react";
 export const General = ({ isNewForm }: { isNewForm: boolean }) => {
     const router = useRouter();
     const { id } = router.query
-    const {generalForm} = useAppSelector(state => state.daoForm)
+    const { generalForm } = useAppSelector(state => state.daoForm)
     const dispatch = useAppDispatch();
     const { activeAccount } = useWallet();
     const [form] = Form.useForm();
     const onFinish = (values: any) => {
         // saveDAO(values).then(data => data !== false ? router.push(`/dao/edit/${data._id}`) : {});
         if (isNewForm) {
-            saveDAO(activeAccount?.address, values).then(data => data ? router.push(`/dao/edit/${data._id}`) : {})
-        } else if(!isNewForm && generalForm.status === 0) {
+            saveDAO(activeAccount?.address, values).then(data => data ?
+                router.push(`/dao/edit/${data._id}`) :
+                {})
+        } else if (!isNewForm && generalForm.status === 0) {
 
         } else {
             // dispatch(setDaoFormProps({ att: "generalForm", value: values }))
             dispatch(updateDaoFormState(1));
         }
     };
-    
+
     useEffect(() => {
-        if (id) {
+        if (id && activeAccount?.address) {
             getDAOByCreatorAndId(activeAccount?.address, id.toString(), form)
         }
 
-    }, [id])
+    }, [id, activeAccount?.address])
     return (
         <Form
             form={form}

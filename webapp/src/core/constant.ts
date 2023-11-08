@@ -23,6 +23,7 @@ export const governanceConfigs = (open: boolean) => {
     }
 }
 export const TESTNET_EXPLORER = 'https://testnet.algoexplorer.io/application';
+export const TESTNET_EXPLORER_ADDRESS = "https://testnet.algoexplorer.io/address";
 export const DEFAULT_NETWORK = 'testnet'
  
 export const DEFAULT_NODE_BASEURL = 'https://testnet-api.algonode.network'
@@ -34,8 +35,3 @@ export const DEFAULT_NODE_PORT = ''
 export const algoClient = new algosdk.Algodv2(DEFAULT_NODE_TOKEN, DEFAULT_NODE_BASEURL, DEFAULT_NODE_PORT)
 
 export const waitRoundsToConfirm = 4
-// Test account 1: 6H5JAUPTWDRYLQRAVJKEEEJZDESR3OBPMBL34CT5BE3LCGB25ITY5UW6CY
-// Test account 2: LC2K22UTBOKMQTZJMHNDL2CSWIJCKVRFLWR262CWFMU25ESY4IOLSLFTUI
-
-
-// DAO status: 0 - draft and wait for approval, 1 - approved, 2 - bootstraped DAO

@@ -12,6 +12,7 @@ import { setAppAccountInformation, setDaoDetailProps } from "src/controller/dao/
 import { getAccountInfo, getAppInfo } from "./util";
 import { getDAOProposals, getOnchainProposal } from "./proposal";
 import { setProposalState } from "src/controller/proposal/proposalSlice";
+import { setDaoProps } from "src/controller/dao/daoSlice";
 // @ts-ignore
 const contract = new algosdk.ABIContract(abi);
 // @ts-ignore
@@ -60,6 +61,46 @@ export const saveDAO = async (address: string, formValues: any) => {
     return savedDAO;
 }
 
+export const getPublicDAOs =async () => {
+    try {
+        let getReq = await fetch("/api/database/dao/getAllDao", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+            },
+            body: JSON.stringify({
+                status: 3
+            })
+        })
+        let daos = await getReq.json();
+        store.dispatch(setDaoProps({att: "daos", value: daos}))
+    } catch(e) {
+        console.log(e);
+    }
+}
+
+
+export const getOwnerDAOs = async (address: string) => {
+    try {
+        if (!address) {
+            openNotification("Your wallet is not currently connected.", `To utilize ALGOGREEN features, please connect your wallet.`, MESSAGE_TYPE.INFO, () => { });
+            return;
+        }
+        let getReq = await fetch("/api/database/dao/getList", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+            },
+            body: JSON.stringify({
+                creator: address
+            })
+        })
+        let daos = await getReq.json();
+        store.dispatch(setDaoProps({att: "ownerDaos", value: daos}))
+    } catch(e) {
+        console.log(e);
+    }
+}
 export const getDAOByCreatorAndId = async (creator: string, id: string, form?: FormInstance<any>) => {
 
     try {

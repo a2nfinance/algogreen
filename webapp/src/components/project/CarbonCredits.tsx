@@ -69,7 +69,7 @@ export const CarbonCredits = () => {
             dataIndex: "action",
             key: "action",
             render: (_, record) => (
-                <Button disabled={record.status !== 2 || !record.app_id} type="primary" onClick={() => showModal(record)}>Sell credits</Button>
+                <Button disabled={record.status !== 2} type="primary" onClick={() => showModal(record)}>Sell credits</Button>
             )
         }
     ];

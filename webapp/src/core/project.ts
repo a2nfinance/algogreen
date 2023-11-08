@@ -99,7 +99,20 @@ export const getMyApprovedProjects = async (address: string) => {
 }
 
 export const getApprovedProjects = async () => {
+    try {
 
+        let req = await fetch(`/api/database/project/getApprovedProjects`, {
+            method: 'GET',
+            headers: {
+                'Content-Type': 'application/json'
+            }
+        });
+        let projects = await req.json();
+        store.dispatch(setProjectState({ att: "allApprovedProjects", value: projects }));
+    } catch (e) {
+        console.log(e);
+        openNotification("Get my projects.", e.message, MESSAGE_TYPE.ERROR, () => { });
+    }
 }
 
 export const getProjectById = async (id: string) => {

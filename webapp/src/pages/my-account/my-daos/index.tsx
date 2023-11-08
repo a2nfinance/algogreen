@@ -1,15 +1,20 @@
+import { useWallet } from "@txnlab/use-wallet";
 import { List } from "antd";
 import { useEffect } from "react";
+import { Item } from "src/components/dao/Item";
 import { useAppSelector } from "src/controller/hooks";
-import { getPublicDAOs } from "src/core/dao";
-import { Item } from "./Item";
+import { getOwnerDAOs } from "src/core/dao";
 
-export const DAOList = () => {
-    // const { featuredProjects } = useAppSelector(state => state.project)
-    const {daos} = useAppSelector(state => state.dao)
+
+export default function Index() {
+    const { activeAccount } = useWallet();
+    const { ownerDaos } = useAppSelector(state => state.dao)
     useEffect(() => {
-        getPublicDAOs()
-    }, [])
+        if (activeAccount?.address) {
+            getOwnerDAOs(activeAccount?.address);
+        }
+
+    }, [activeAccount?.address])
     return (
         <List
             grid={{
@@ -24,7 +29,7 @@ export const DAOList = () => {
                 pageSize: 9,
                 align: "center",
             }}
-            dataSource={daos}
+            dataSource={ownerDaos}
             renderItem={(item, index) => (
                 <Item index={index} daoFromDB={item} />
             )}

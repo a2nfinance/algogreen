@@ -1,32 +1,15 @@
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
+import { DaoFromDB } from './daoDetailSlice';
 
-export type DAO = {
-    _id?: string,
-    title: string,
-    description: string,
-    contract_name: string,
-    owner: string,
-    quorum: number,
-    passing_threshold: number,
-    dao_type: number,
-    submission_policy: number,
-    dao_address: string,
-    treasury_address: string,
-    twitter: string,
-    github: string,
-    discord: string,
-    status: number,
-    created_at?: any
-}
 
 
 type DaoState = {
     isLoadingDaos: boolean,
     isLoadingSubDaos: boolean,
-    daos: DAO[],
-    subDaos: DAO[],
-    ownerDaos: DAO[],
-    ownerSubDaos: DAO[],
+    daos: DaoFromDB[],
+    subDaos: DaoFromDB[],
+    ownerDaos: DaoFromDB[],
+    ownerSubDaos: DaoFromDB[],
     countOwnerProposal: number,
     countOwnerDaos: number,
 }

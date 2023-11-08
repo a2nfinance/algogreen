@@ -3,18 +3,12 @@ import { useEffect } from "react";
 import { useAppSelector } from "src/controller/hooks";
 // import { getDaos } from "src/core";
 import { Item } from "./Item";
+import { getApprovedProjects } from "src/core/project";
 
 export const ProjectList = () => {
-    // const { featuredProjects } = useAppSelector(state => state.project)
-    const featuredProjects = [1,2,3,5,6,7,8,9,10].map( m=> {
-        return {
-            id: m,
-            title: `${m} title`,
-            description: `${m} description`
-        }
-    })
+    const { allApprovedProjects } = useAppSelector(state => state.project)
     useEffect(() => {
-        // getDaos()
+        getApprovedProjects();
     }, [])
     return (
         <List
@@ -30,7 +24,7 @@ export const ProjectList = () => {
                 pageSize: 9,
                 align: "center",
             }}
-            dataSource={featuredProjects}
+            dataSource={allApprovedProjects}
             renderItem={(item, index) => (
                 <Item index={index} project={item} />
             )}

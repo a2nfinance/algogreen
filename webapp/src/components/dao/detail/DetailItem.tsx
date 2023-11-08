@@ -1,9 +1,7 @@
-import { CopyOutlined, LinkOutlined } from '@ant-design/icons';
-import { Button, Card, Descriptions, Divider, Space, Tag } from 'antd';
-import { DAO } from 'src/controller/dao/daoSlice';
+import { LinkOutlined } from '@ant-design/icons';
+import { Card, Descriptions, Divider, Tag } from 'antd';
 import { useAppSelector } from 'src/controller/hooks';
-import { TESTNET_EXPLORER, daoTypeMap } from 'src/core/constant';
-import { useAddress } from 'src/hooks/useAddress';
+import { TESTNET_EXPLORER } from 'src/core/constant';
 import { headStyle } from 'src/theme/layout';
 
 

@@ -1,8 +1,9 @@
 import { FormInstance } from "antd";
-import { MESSAGE_TYPE, openNotification } from "./common";
-import { store } from "src/controller/store";
-import { actionNames, processKeys, updateProcessStatus } from "src/controller/process/processSlice";
 import { setLoans } from "src/controller/dao/daoDetailSlice";
+import { setAllLoans } from "src/controller/loan/loanSlice";
+import { actionNames, processKeys, updateProcessStatus } from "src/controller/process/processSlice";
+import { store } from "src/controller/store";
+import { MESSAGE_TYPE, openNotification } from "./common";
 
 
 export const getLoansList =async (dao_id: string) => {
@@ -18,8 +19,24 @@ export const getLoansList =async (dao_id: string) => {
         });
 
         const loans = await loanListReq.json();
-        console.log("Loans:", loans)
         store.dispatch(setLoans(loans))
+    } catch(e) {
+        console.log(e)
+    }
+}
+
+
+export const getAllLoans =async () => {
+    try {
+        let loanListReq = await fetch(`/api/database/loan/getAllLoans`, {
+            method: 'GET',
+            headers: {
+                'Content-Type': 'application/json'
+            }
+        });
+
+        const loans = await loanListReq.json();
+        store.dispatch(setAllLoans(loans))
     } catch(e) {
         console.log(e)
     }

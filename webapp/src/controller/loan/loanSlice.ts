@@ -1,10 +1,12 @@
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
 
 type LoanState = {
-    loanDetail: any
+    loanDetail: any,
+    allLoans: any[]
 }
 const initialState: LoanState = {
-    loanDetail: {}
+    loanDetail: {},
+    allLoans: []
 }
 
 export const loanSlice = createSlice({
@@ -13,8 +15,11 @@ export const loanSlice = createSlice({
     reducers: {
         setCurrentLoan: (state: LoanState, action: PayloadAction<any>) => {
             state.loanDetail = action.payload
+        },
+        setAllLoans: (state: LoanState, action: PayloadAction<any>) => {
+            state.allLoans = action.payload
         }
     }
 })
-export const { setCurrentLoan } = loanSlice.actions;
+export const { setCurrentLoan, setAllLoans } = loanSlice.actions;
 export default loanSlice.reducer;
