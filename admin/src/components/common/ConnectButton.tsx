@@ -89,7 +89,7 @@ export const ConnectButton = () => {
         </Dropdown>
       </Space>
         : <Button type="primary" size="large" onClick={() => showModal()}>Connect Wallet</Button>}
-      <Modal title="Basic Modal" open={isModalOpen} onOk={handleOk} onCancel={handleCancel} footer={null}>
+      <Modal width={480} title={<h3 style={{textAlign: "center"}}>Connect your wallet</h3>} open={isModalOpen && !activeAccount?.address} onOk={handleOk} onCancel={handleCancel} footer={null}>
         <ConnectMenu />
       </Modal>
     </>
