@@ -93,7 +93,7 @@ export const Detail = () => {
             <Modal width={600} open={newAuctionModal} onCancel={handleModalCancel} footer={null} >
                 <Card title="New auction">
                     <Form form={form} onFinish={onFinish} layout="vertical">
-                        <Alert type="info" message="After you create an auction, please wait for actions of credits owner!" showIcon />
+                        <Alert type="info" message="After creating an auction, please wait for the actions of the credits owner." showIcon />
                         <br />
                         <Form.Item name={"quantity"} label="Quantity" rules={[{ required: true, message: 'Missing quantity' }]}>
                             <Input size='large' type="number" max={creditAppInfo ? creditAppInfo["assets"][0].amount : credit.total_credits} addonAfter={"credits"} />
@@ -108,7 +108,7 @@ export const Detail = () => {
                 </Card>
             </Modal>
             <Modal width={600} title="Auctions" open={auctionsModal} onCancel={handleAuctionModalCancel} footer={null} >
-                <Alert type="info" message={"Only credits owner can accept an auction and only bidders can buy if their auctions are accepted!"} />
+                <Alert type="info" message={"Only the owner of the credits can accept an auction, and only bidders can purchase them if their auctions are accepted."} />
                 <br />
                 <Table
                     pagination={false}
