@@ -10,7 +10,7 @@ import { setDaoFormProps, updateDaoFormState } from "src/controller/dao/daoFormS
 import { FormInstance } from "antd";
 import { setAppAccountInformation, setDaoDetailProps } from "src/controller/dao/daoDetailSlice";
 import { getAccountInfo, getAppInfo } from "./util";
-import { getDAOProposals, getOnchainProposal } from "./proposal";
+import { getDAOProposals, getOnchainProposal, getProjectProposals } from "./proposal";
 import { setProposalState } from "src/controller/proposal/proposalSlice";
 import { setDaoProps } from "src/controller/dao/daoSlice";
 // @ts-ignore
@@ -452,7 +452,7 @@ export const optAccountIntoAsset = async (
         openNotification("Opt-in", `Opt your account into the DAO asset successful!`, MESSAGE_TYPE.SUCCESS, () => { });
     } catch (e) {
         console.log(e);
-        openNotification("Opt-in", e.message, MESSAGE_TYPE.SUCCESS, () => { });
+        openNotification("Opt-in", e.message, MESSAGE_TYPE.ERROR, () => { });
     }
     store.dispatch(updateProcessStatus({
         actionName: actionNames.optInAssetAction,
@@ -623,7 +623,8 @@ export const createProposal = async (
                 term: loanDetail.term
             })
         })
-
+        // refresh dao proposal
+        getDAOProposals(daoFromDB._id);
         // Noti
         openNotification("Create proposal", `Create proposal successful!`, MESSAGE_TYPE.SUCCESS, () => { })
     } catch (e) {
@@ -863,6 +864,7 @@ export const repayProposal = async (
         // dispatch proposal detail
         store.dispatch(setProposalState({ att: "proposal", value: { ...proposal, is_repaid: 1 } }));
         getDAOProposals(daoFromDB._id);
+        getProjectProposals(daoFromDB._id);
         openNotification("Repay proposal", `Repay proposal successful!`, MESSAGE_TYPE.SUCCESS, () => { });
     } catch (e) {
         console.log(e);

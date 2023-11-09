@@ -84,7 +84,9 @@ export const Detail = () => {
             <Divider />
             <Descriptions layout="vertical">
                 <Descriptions.Item label="Description">
-                    {credit.description}
+                    <div
+                        dangerouslySetInnerHTML={{ __html: credit.description }}
+                    />
                 </Descriptions.Item>
             </Descriptions>
 
@@ -112,11 +114,11 @@ export const Detail = () => {
                     pagination={false}
                     columns={[
                         {
-                            title: "Buyer",
+                            title: "Bidder",
                             key: "buyer",
                             dataIndex: "buyer",
                             render: (_, record) => (
-                                <a href={`${TESTNET_EXPLORER_ADDRESS}/${record.buyer}`} target="_blank">{record.buyer === activeAccount?.address ? "My auction" : getShortAddress(record.buyer)}</a>
+                                <a href={`${TESTNET_EXPLORER_ADDRESS}/${record.buyer}`} target="_blank">{record.buyer === activeAccount?.address ? "me" : getShortAddress(record.buyer)}</a>
                             )
                         },
                         {

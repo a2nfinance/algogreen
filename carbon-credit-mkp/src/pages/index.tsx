@@ -1,9 +1,10 @@
-import { Card } from "antd";
+import { Card, Divider } from "antd";
 
 import { Typography } from 'antd';
 import { useRouter } from "next/router";
 import { Credits } from "src/components/homepage/Credits";
 import { Projects } from "src/components/homepage/Projects";
+import { QuotesSlider } from "src/components/homepage/QuotesSlider";
 import { Slider } from "src/components/homepage/Slider";
 // import { FeatureImageSlides } from "src/components/home/FeatureImageSlides";
 
@@ -16,8 +17,11 @@ export default function Index() {
     return (
         <div style={{ maxWidth: 1200, margin: "auto", padding: 10 }}>
             <Slider />
-            <Projects/>
-            <Credits/>
+            <Projects />
+            <Divider />
+            <QuotesSlider />
+            <Divider />
+            <Credits />
         </div>
     )
 }

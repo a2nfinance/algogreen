@@ -24,7 +24,7 @@ export const ProposalDetail = () => {
                 }
             </Space>}
             {
-                (proposal.executed && !proposal.is_repaid && activeAccount?.address === proposal.creator) && <Button
+                (!!proposal.executed && !proposal.is_repaid && activeAccount?.address === proposal.creator) && <Button
                     loading={repayAction.processing}
                     type="primary"
                     onClick={() => repayProposal(activeAccount?.address, signTransactions, sendTransactions)} size="large">
@@ -36,7 +36,7 @@ export const ProposalDetail = () => {
                 <Descriptions.Item label={"Borrow amount (ALGO)"}>{proposal.borrow_amount}</Descriptions.Item>
                 <Descriptions.Item label={"Interest rate"}>{proposal.interest_rate} %</Descriptions.Item>
                 <Descriptions.Item label={"Allow early repay"}>{proposal.allow_early_repay ? "Yes" : "No"}</Descriptions.Item>
-                <Descriptions.Item label={"Project"}><a onClick={() => router.push(`/project/${proposal.project_id}`)}><LinkOutlined /></a></Descriptions.Item>
+                <Descriptions.Item label={"Project"}><a onClick={() => router.push(`/project/detail/${proposal.project_id}`)}><LinkOutlined /></a></Descriptions.Item>
                 <Descriptions.Item label={"DAO"}><a onClick={() => router.push(`/dao/detail/${proposal.dao_id}`)}><LinkOutlined /></a></Descriptions.Item>
                 <Descriptions.Item label={"Loan"}><a onClick={() => router.push(`/loan/detail/${proposal.loan_id}`)}><LinkOutlined /></a></Descriptions.Item>
             </Descriptions>
