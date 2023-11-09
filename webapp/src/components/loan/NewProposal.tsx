@@ -23,18 +23,18 @@ export const NewProposal = () => {
         }
     }, [activeAccount?.address])
     return (
-        <Card title={`Apply to: ${loanDetail.title}`}>
+        <Card title={`Apply for: ${loanDetail.title}`}>
             <Form
                 name='new_loan_form'
                 form={form}
                 onFinish={onFinish}
                 layout='vertical'>
-                <Alert type="info" message="To apply to a loan program, you need to create a proposal and wait for voting process of DAO members." showIcon />
+                <Alert type="info" message="To apply for a loan program, you must create a proposal and await the voting process by DAO members." showIcon />
                 <br />
                 <Form.Item name={"title"} label="Title" rules={[{ required: true, message: 'Missing title' }]}>
                     <Input size='large' />
                 </Form.Item>
-                <Form.Item name={"date"} label="Start time / End time" rules={[{ required: true, message: 'Missing start time and end time' }]}>
+                <Form.Item name={"date"} label="Voting start date & end date" rules={[{ required: true, message: 'Missing start date and end date' }]}>
                     <RangePicker size='large' showTime style={{ width: "100%" }} />
                 </Form.Item>
                 <Form.Item name="project_id" label={"Select your project"}
@@ -46,7 +46,7 @@ export const NewProposal = () => {
                         </Form.Item>
                 <Row gutter={12}>
                     <Col span={12}>
-                        <Form.Item name="allow_early_execution" label={"Allow proposal early execution"}
+                        <Form.Item name="allow_early_execution" label={"Allow early execution"}
                             rules={[{ required: true, message: '' }]}
                             initialValue={1}
                         >
@@ -58,7 +58,7 @@ export const NewProposal = () => {
 
                     </Col>
                     <Col span={12}>
-                    <Form.Item name="is_eco_project" label={"Apply to the special interest rate"}
+                    <Form.Item name="is_eco_project" label={"Apply for the special interest rate"}
                             rules={[{ required: true, message: '' }]}
                             initialValue={1}
                         >

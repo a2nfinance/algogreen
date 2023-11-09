@@ -108,7 +108,7 @@ export const Detail = () => {
                 </Card>
             </Modal>
             <Modal width={600} title="Auctions" open={auctionsModal} onCancel={handleAuctionModalCancel} footer={null} >
-                <Alert type="info" message={"Only credits owner can accept an auction and only auctioneers can buy if their auctions are accepted!"} />
+                <Alert type="info" message={"Only credits owner can accept an auction and only bidders can buy if their auctions are accepted!"} />
                 <br />
                 <Table
                     pagination={false}

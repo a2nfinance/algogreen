@@ -26,25 +26,25 @@ export const LoanForm = () => {
             <Form.Item name={"title"} label="Title" rules={[{ required: true, message: 'Missing title' }]}>
                 <Input size='large' />
             </Form.Item>
-            <Form.Item name={"date"} label="Start date / End date" rules={[{ required: true, message: 'Missing start date and end date' }]}>
+            <Form.Item name={"date"} label="Program start date & end date" rules={[{ required: true, message: 'Missing start date and end date' }]}>
                 <RangePicker size='large' showTime style={{width: "100%"}} />
             </Form.Item>
             <Divider />
             <Row gutter={12}>
                 <Col span={12}>
-                    <Form.Item name={"maximum_borrow_amount"} label="Maximum borrow amount" rules={[{ required: true, message: 'Missing maximum borrow amount' }]}>
+                    <Form.Item name={"maximum_borrow_amount"} label="Maximum borrowing amount" rules={[{ required: true, message: 'Missing maximum borrowing amount' }]}>
                         <Input size='large' type='number' addonAfter={"ALGO"} />
                     </Form.Item>
                 </Col>
                 <Col span={12}>
-                    <Form.Item name={"term"} label="Term" rules={[{ required: true, message: 'Missing address' }]}>
+                    <Form.Item name={"term"} label="Term" rules={[{ required: true, message: 'Missing term' }]}>
                         <Input size='large' type='number' addonAfter={"Months"} />
                     </Form.Item>
                 </Col>
             </Row>
             <Row gutter={12}>
                 <Col span={12}>
-                    <Form.Item name={"general_interest_rate"} label="General interest rate" rules={[{ required: true, message: 'Missing address' }]}>
+                    <Form.Item name={"general_interest_rate"} label="General interest rate" rules={[{ required: true, message: 'Missing general interest rate' }]}>
                         <Input size='large' type='number' suffix="%" />
                     </Form.Item>
                 </Col>

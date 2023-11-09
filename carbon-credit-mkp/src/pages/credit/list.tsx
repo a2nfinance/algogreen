@@ -65,7 +65,7 @@ export default function AllCredits() {
         getApprovedCredits()
     }, [])
     return (
-        <Card title="All Selling Credits" style={{ border: "none" }}
+        <Card title="All carbon Credits" style={{ border: "none" }}
             headStyle={{ padding: 0, textTransform: "uppercase" }}
             bodyStyle={{ paddingLeft: 0, paddingRight: 0 }}>
             <Table

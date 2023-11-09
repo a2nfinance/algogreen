@@ -65,7 +65,7 @@ export const Credits = () => {
     }, [])
 
     return (
-        <Card title="New Selling Credits" style={{ border: "none" }}
+        <Card title="New Carbon Credits" style={{ border: "none" }}
             headStyle={{ padding: 0, textTransform: "uppercase" }}
             bodyStyle={{ paddingLeft: 0, paddingRight: 0 }}
             extra={

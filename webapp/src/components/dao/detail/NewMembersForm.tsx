@@ -17,7 +17,7 @@ export const NewMembersForm = () => {
             name='new_members_form'
             onFinish={onFinish}
             layout='vertical'>
-            <Alert type='info' message="All members must opt their account into DAO asset to ensure this action is success" showIcon />
+            <Alert type='info' message="All members must opt their accounts into DAO assets to ensure the success of this action." showIcon />
             <Divider />
             <Form.List name={"members"}>
                 {(memberFields, { add: addMember, remove: removeMember }) => (

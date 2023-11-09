@@ -17,9 +17,9 @@ export default function Index() {
             <Text italic>-Albert Einstein, Physicist</Text>
             <Divider />
             <Space>
-                <Button size="large">Pending DAOs</Button>
-                <Button size="large">Pending Projects</Button>
-                <Button size="large">Pending Carbon Credits</Button>
+                <Button size="large" onClick={() => router.push("/dao/list")}>Pending DAOs</Button>
+                <Button size="large" onClick={() => router.push("/project/list")}>Pending Projects</Button>
+                <Button size="large" onClick={() => router.push("/credit/list")}>Pending Carbon Credits</Button>
             </Space>
             <Divider />
             <Steps
@@ -33,7 +33,7 @@ export default function Index() {
                         title: "Validate documents",
                     },
                     {
-                        title: "Dive into description",
+                        title: "Delve into description",
                     },
                 ]}
             />

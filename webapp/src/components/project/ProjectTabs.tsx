@@ -8,7 +8,7 @@ export const ProjectTabs = () => {
     const items: TabsProps['items'] = [
         {
             key: '1',
-            label: `Proposal`,
+            label: `Loan proposals`,
             children:  <Proposals />,
         },
         {

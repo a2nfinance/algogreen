@@ -14,9 +14,9 @@ export const LoanDetail = () => {
                 <Descriptions.Item label={"Special interest rate"}>{loanDetail.special_interest_rate} %</Descriptions.Item>
                 <Descriptions.Item label={"Start date"}>{new Date(loanDetail.start_date).toLocaleString()}</Descriptions.Item>
                 <Descriptions.Item label={"End date"}>{new Date(loanDetail.end_date).toLocaleString()}</Descriptions.Item>
-                <Descriptions.Item label={"Maximum borrow amount"}>{loanDetail.maximum_borrow_amount}</Descriptions.Item>
+                <Descriptions.Item label={"Maximum borrowing amount"}>{loanDetail.maximum_borrow_amount} ALGO</Descriptions.Item>
                 <Descriptions.Item label={"Term"}>{loanDetail.term} months</Descriptions.Item>
-                <Descriptions.Item label={"Required colleteral"}>{loanDetail.require_collateral ? "Yes" : "No"}</Descriptions.Item>
+                <Descriptions.Item label={"Required collateral"}>{loanDetail.require_collateral ? "Yes" : "No"}</Descriptions.Item>
                 <Descriptions.Item label={"Allow early repay"}>{loanDetail.allow_early_repay ? "Yes" : "No"}</Descriptions.Item>
 
             </Descriptions>

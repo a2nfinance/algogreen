@@ -53,7 +53,7 @@ export const ReviewAndApprove = () => {
 
             <Divider />
 
-            <Button type="primary" onClick={() => router.push(`/dao/detail/${generalForm._id}`)}>View onchain DAO details</Button>
+            <Button type="primary" size="large" onClick={() => router.push(`/dao/detail/${generalForm._id}`)}>View DAO details</Button>
         </Card>
     )
 }

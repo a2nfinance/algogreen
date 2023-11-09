@@ -10,7 +10,7 @@ export default function AllProjects() {
         getApprovedProjects();
     }, [])
     return (
-        <Card title="All Projects" style={{ border: "none" }} headStyle={{ padding: 0, textTransform: "uppercase" }}
+        <Card title="All eco friendly Projects" style={{ border: "none" }} headStyle={{ padding: 0, textTransform: "uppercase" }}
             bodyStyle={{ paddingLeft: 0, paddingRight: 0 }}>
             <List
                 grid={{

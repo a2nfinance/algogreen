@@ -23,7 +23,7 @@ export const LoanStatistic = () => {
             </Col>
             <Col span={6}>
                 <Card style={statisticCard} >
-                    <Statistic title="Interest rate is below 3%" value={allLoans.filter(l => l.special_interest_rate <= 3).length} />
+                    <Statistic title="The interest rate is less than 3%" value={allLoans.filter(l => l.special_interest_rate <= 3).length} />
                 </Card>
             </Col>
         </Row>

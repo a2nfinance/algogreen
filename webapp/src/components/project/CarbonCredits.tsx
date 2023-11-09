@@ -33,7 +33,7 @@ export const CarbonCredits = () => {
             key: 'title',
         },
         {
-            title: "Amount (kilograms)",
+            title: "Credits (carbon offset kilograms)",
             dataIndex: "total_credits",
             key: "total_credits",
             // render: (_, record) => (
@@ -41,11 +41,11 @@ export const CarbonCredits = () => {
             // )
         },
         {
-            title: "Proof document",
+            title: "Detailed ocument",
             dataIndex: "proof_document",
             key: "proof_document",
             render: (_, record) => (
-                <Button>Detail</Button>
+                <a href={record.proof_document} target={'_blank'}>Detail</a>
             )
         },
         {

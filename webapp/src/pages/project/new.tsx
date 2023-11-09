@@ -21,7 +21,7 @@ export default function New() {
         <div style={{ maxWidth: 600, margin: "auto" }}>
 
             <Card title="New Project" headStyle={headStyle} style={{ backgroundColor: "#f5f5f5" }}>
-                <Alert type="info" showIcon message={"A new project need verification and approval of Algogreen."} />
+                <Alert type="info" showIcon message={"A new project requires verification and approval from Algogreen admins before it becomes visible to everyone or before you can apply for a project loan."} />
                 <br />
                 <Form name="new_project_form" form={form} onFinish={onFinish} layout="vertical">
                     <Form.Item name={"project_name"} label="Project name" rules={[{ required: true, message: 'Missing project name' }]}>
@@ -44,7 +44,7 @@ export default function New() {
                         <Input.TextArea size='large' />
                     </Form.Item>
                     <Divider />
-                    <Form.Item name="is_eco_project" label={"Is a carbon offset project"}
+                    <Form.Item name="is_eco_project" label={"It is a carbon offset project"}
                         rules={[{ required: true, message: '' }]}
                         initialValue={1}
                     >
@@ -57,14 +57,14 @@ export default function New() {
                     <Form.Item name={"project_location"} label="Project location" rules={[{ required: true, message: 'Missing project location' }]}>
                         <Input size='large' />
                     </Form.Item>
-                    <Form.Item name={"date"} label="Start date - End date" rules={[{ required: true, message: 'Missing start date & end date' }]}>
+                    <Form.Item name={"date"} label="Project start date & end date" rules={[{ required: true, message: 'Missing start date & end date' }]}>
                         <RangePicker size='large' style={{ width: "100%" }} />
                     </Form.Item>
                     <Divider />
                     <Form.Item name={"description"} label={"Description"} rules={[{ required: true, message: 'Missing description' }]} noStyle>
                         <Input size='large' type='hidden' />
                     </Form.Item>
-                    <Alert type="info" showIcon message={"Project description should including your project purpose, project scope, business information, and team member profiles."} />
+                    <Alert type="info" showIcon message={"Project description should include your project purpose, scope, business information, and team member profiles."} />
                     <br />
                     <Editor
                         apiKey='1n11uzr2bd1kkoxh5dtycsp075phj3ivlopf4veknfhgxfyo'
@@ -89,7 +89,7 @@ export default function New() {
                     <Divider />
 
 
-                    <Form.Item name={"detail_document"} label={"Detail document"} rules={[{ required: true, message: "Missing detail document link", type: "url" }]}>
+                    <Form.Item name={"detail_document"} label={"Detailed document"} rules={[{ required: true, message: "Missing detail document link", type: "url" }]}>
                         <Input size='large' />
                     </Form.Item>
                     <Row gutter={12}>

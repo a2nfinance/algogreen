@@ -12,7 +12,7 @@ export const Projects = () => {
         getFeaturedProjects();
     }, [])
     return (
-        <Card title="New Projects" style={{ border: "none" }} headStyle={{ padding: 0, textTransform: "uppercase" }}
+        <Card title="New eco friendly projects" style={{ border: "none" }} headStyle={{ padding: 0, textTransform: "uppercase" }}
             bodyStyle={{ paddingLeft: 0, paddingRight: 0 }}
             extra={
                 <Button type="primary" onClick={() => router.push(`/project/list`)}>More</Button>

@@ -57,17 +57,17 @@ export const LoanList = () => {
             )
         },
         {
-            title: "Maximum borrow amount (ALGO)",
+            title: "Maximum borrowing amount (ALGO)",
             dataIndex: "maximum_borrow_amount",
             key: "maximum_borrow_amount",
         },
         {
-            title: "General rate",
+            title: "General interest rate (%)",
             dataIndex: "general_interest_rate",
             key: "general_interest_rate",
         },
         {
-            title: "Special rate",
+            title: "Special interest rate (%)",
             dataIndex: "special_interest_rate",
             key: "special_interest_rate",
         },
