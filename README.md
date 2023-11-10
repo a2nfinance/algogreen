@@ -58,7 +58,7 @@ Copy artifacts from contracts folder to webapp, admin, and carbon-credit-mkp fol
 ## Commands to start
 
 - To run webapp in Dev mode, use this command: ```npm run dev```. 
-- To run webapp in Production mdoe, use this command: ```pm2 run npm --name "your app name" -- run start```
+- To run webapp in Production mode, use this command: ```npm run build``` and ```pm2 run npm --name "your app name" -- run start```
 
 ## Test smart contracts
 
