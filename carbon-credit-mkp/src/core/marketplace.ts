@@ -178,6 +178,7 @@ export const acceptAuction = async (
 export const doBuyWithAuction = async (
     address: string,
     auction_index: number,
+    price: number,
     buyer: string,
     signTransactions: Function,
     sendTransactions: Function
@@ -213,7 +214,7 @@ export const doBuyWithAuction = async (
         const paymentTxn = algosdk.makePaymentTxnWithSuggestedParamsFromObject({
             from: address,
             to: appAddress,
-            amount: 500_000,
+            amount: Math.floor(price * 10**6),
             suggestedParams: { ...suggestedParams, fee: algosdk.ALGORAND_MIN_TX_FEE, flatFee: true },
             note: (new ABIStringType()).encode("Auction Payment")
         });

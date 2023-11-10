@@ -139,7 +139,7 @@ export const Detail = () => {
                                 <Space>
                                     {record.status === 1 && activeAccount?.address !== credit.creator && <Button
                                         disabled={activeAccount?.address !== record.buyer}
-                                        onClick={() => doBuyWithAuction(activeAccount?.address, record.auction_index, record.buyer, signTransactions, sendTransactions)}
+                                        onClick={() => doBuyWithAuction(activeAccount?.address, record.auction_index, record.price, record.buyer, signTransactions, sendTransactions)}
                                         loading={buyCreditAction.processing}
                                         type="primary">
                                         buy now
