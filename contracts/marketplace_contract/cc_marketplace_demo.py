@@ -33,7 +33,7 @@ accounts = localnet.kmd.get_accounts()
 acct0 = accounts[0]
 ## seller
 acct1 = accounts[1]
-## buyer
+## bidder/buyer
 acct2 = accounts[2]
 
 ## Algo app client
@@ -130,10 +130,7 @@ print("Accepted Auction:", get_auction_record_req.return_value)
 
 # 6.=====================================================================
 ## Do buy with an auction
-## Opt buyer's accoun into NFT assets.
-
-## Account 2 opting in
-## op-in
+## Opt buyer's account into DAO's token.
 app_client.client.send_transaction(
     AssetOptInTxn(acct2.address, sp, asset_id).sign(
         acct2.private_key
@@ -167,7 +164,7 @@ get_auction_record_req_after_buy = mkp_app_client_buyer.call(
 )
 print("Completed Auction:", get_auction_record_req_after_buy.return_value)
 
-## Check account 1 / 2 balance
+## Check balances of seller and buyer
 
 account_asset_info = algod_client.account_asset_info(acct2.address, asset_id)
 print("Buyer Asset info:", account_asset_info)

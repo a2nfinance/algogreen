@@ -31,7 +31,7 @@ class MarketplaceState:
 
     origin_price = GlobalStateValue(
         stack_type=TealType.uint64,
-        descr="Original price"
+        descr="Credits' origin price"
     )
     allow_auction = GlobalStateValue(
         stack_type=TealType.uint64,
@@ -45,7 +45,7 @@ class MarketplaceState:
     
     auctions_counter = GlobalStateValue(
         stack_type=TealType.uint64,
-        descr="Count how many created autction"
+        descr="Count the number of created auctions"
     )
 
    
