@@ -15,7 +15,7 @@ class DAOState:
 
     passing_threshold = GlobalStateValue(
         stack_type=TealType.uint64,
-        descr="The proportion of those who voted on a proposal who must vote 'Aggree' for it to pass."
+        descr="The proportion of those who voted on a proposal who must vote 'Agree' for it to pass."
     )
     
     quorum = GlobalStateValue(
@@ -24,8 +24,8 @@ class DAOState:
     )
 
     proposal_submission_policy = GlobalStateValue(
-        stack_type=TealType.uint64,
-        descr="Who is allowed to submit proposals to the DAO?"
+        stack_type=TealType.uint64, # 0: only members, 1: anyone
+        descr="Who has the authorization to submit proposals to the DAO?"
     )
 
     membership_token = GlobalStateValue(
@@ -36,7 +36,7 @@ class DAOState:
     
     count_member = GlobalStateValue(
         stack_type=TealType.uint64,
-        descr="Count number of members"
+        descr="Count the number of members"
     )
 
     def __init__(self):
@@ -55,6 +55,8 @@ dao_app = Application(
     state=DAOState()
 )
 
+
+# This function is employed when deploying a new smart contract.
 @dao_app.create
 def create(
     title: abi.String, 
@@ -69,6 +71,9 @@ def create(
         dao_app.state.proposal_submission_policy.set(proposal_submission_policy.get())
     )
 
+# This function comprises:
+# 1. A seed payment to augment the contract balance
+# 2. Creation of a new membership token for DAO members.
 @dao_app.external(authorize=Authorize.only_creator())
 def bootstrap(
     seed: abi.PaymentTransaction,
@@ -105,6 +110,7 @@ def bootstrap(
         output.set(dao_app.state.membership_token)
     )
 
+# Whether an account address is a member.
 @dao_app.external
 def check_is_member(
     address: abi.Account,
@@ -115,6 +121,7 @@ def check_is_member(
         If(is_member(address.address()) == Int(1)).Then(output.set(Int(1))).Else(output.set(Int(0)))
     )
 
+# Add a new member
 @dao_app.external(authorize=Authorize.only_creator())
 def add_new_member(
     new_member: abi.Account,
@@ -126,6 +133,7 @@ def add_new_member(
         dao_app.state.count_member.increment()
     )
 
+# Add multiple new members
 @dao_app.external(authorize=Authorize.only_creator())
 def add_members(
     new_members: abi.DynamicArray[abi.Address],
@@ -148,6 +156,10 @@ def add_members(
         output.set(new_members.length())
     )
 
+# A proposal is deployed as a child app. Therefore, the proposer needs to make a token payment to augment the DAO's balance.
+# This function includes:
+# 1. A payment transaction
+# 2. An inner transaction to create a new proposal contract.
 @dao_app.external
 def create_proposal(
     seed: abi.PaymentTransaction,
@@ -198,6 +210,8 @@ def create_proposal(
         output.set(InnerTxn.created_application_id())
     )
 
+# Currently, the voting function supports two options: agree and disagree.
+# This function utilizes an inner transaction to invoke the proposal smart contract.
 @dao_app.external
 def vote(
     proposal_app_id: abi.Uint64, 
@@ -222,6 +236,9 @@ def vote(
         output.set(agree)
     )
 
+## This function comprises:
+## 1. Updating the proposal smart contract
+## 2. If the first inner transaction is successful, then this DAO will send a token amount to the proposer.
 @dao_app.external
 def execute_proposal(
     proposal_app_id: abi.Uint64, 
@@ -252,6 +269,9 @@ def execute_proposal(
         )
     )
 
+# An executed proposal becomes a loan contract, and the proposer has a responsibility to repay the debt.
+# 1. A payment transaction, with a token amount sent to this DAO.
+# 2. An inner transaction occurs to invoke and update the state of the proposal contract.
 @dao_app.external
 def repay_proposal(
     repay_txn: abi.PaymentTransaction,
@@ -274,6 +294,8 @@ def repay_proposal(
 def get_minimum_balance(*, output: abi.Uint64) -> Expr:
     return output.set(MinBalance(Global.current_application_address()))
 
+
+# Only the DAO creator has the authority to withdraw the money to their account.
 @dao_app.external(authorize=Authorize.only_creator())
 def withdraw(amount: abi.Uint64, *, output: abi.Uint64) -> Expr:
     balance= Balance(Global.current_application_address())

@@ -97,7 +97,7 @@ proposal_app = Application(
     state=ProposalState(),
 )
 
-
+# This function is employed when deploying a new smart contract.
 @proposal_app.create
 def create(
     owner: abi.Address,
@@ -132,12 +132,15 @@ def create(
         proposal_app.state.dao_token.set(dao_token.get())
     )
 
+# Members must opt their account into this app to use local state.
+# Contains a code placeholder to handle the opt-in action.
 @proposal_app.opt_in
 def opt_in() -> Expr:
     return Seq(
         
     )
 
+# A vote must meet the proposal conditions before this action can alter the state of this app.
 @proposal_app.external(authorize= Authorize.only(proposal_app.state.dao_app_address.get()))
 def vote(voter: abi.Account, agree: abi.Uint64, *, output: abi.Uint64) -> Expr:
     return Seq(
@@ -154,6 +157,7 @@ def vote(voter: abi.Account, agree: abi.Uint64, *, output: abi.Uint64) -> Expr:
         output.set(Int(1))
     )
 
+# The execution of this proposal is only triggered if the voting result satisfies the quorum, passing threshold, and other conditions.
 @proposal_app.external(authorize= Authorize.only(proposal_app.state.dao_app_address.get()))
 def execute(quorum: abi.Uint64, passing_threshold: abi.Uint64, count_member: abi.Uint64, borrow_amount: abi.Uint64, proposer: abi.Address, *, output: abi.Uint64) -> Expr:
     return Seq(
@@ -172,6 +176,7 @@ def execute(quorum: abi.Uint64, passing_threshold: abi.Uint64, count_member: abi
         output.set(Int(1))
     )
 
+# Proposer repays his debt 
 @proposal_app.external(authorize=Authorize.only(proposal_app.state.dao_app_address.get()))
 def repay(repay_amount: abi.Uint64, owner: abi.Address) -> Expr:
     return Seq(

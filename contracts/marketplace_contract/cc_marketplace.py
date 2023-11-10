@@ -13,7 +13,7 @@ class AuctionRecord(abi.NamedTuple):
     buyer: abi.Field[abi.Address]
     quantity: abi.Field[abi.Uint64]
     price: abi.Field[abi.Uint64]
-    status: abi.Field[abi.Uint64] # 0: init, 1: accepted, 2: completed
+    status: abi.Field[abi.Uint64] # 0: new auction, 1: accepted, 2: completed
 
 class MarketplaceState:   
     asset_id = GlobalStateValue(
@@ -63,12 +63,14 @@ class MarketplaceState:
             ) * max_number
         )
 
+# The limited number of auctions is 10.
 mkp_app = Application(
     "Carbon Credit Selling Contract",
     state=MarketplaceState(max_number=10, record_type=AuctionRecord),
     build_options=BuildOptions(scratch_slots=False),
 )
 
+# This function is employed when deploying a new smart contract.
 @mkp_app.create
 def create(seller: abi.Address, total_credits: abi.Uint64) -> Expr:
     return Seq(
@@ -77,6 +79,7 @@ def create(seller: abi.Address, total_credits: abi.Uint64) -> Expr:
         mkp_app.state.total_credits.set(total_credits.get())
     )
 
+# After the request for issuing credits is accepted, the credits owner needs to initialize this app to start selling carbon credits.
 @mkp_app.external(authorize=Authorize.only(mkp_app.state.seller.get()))
 def bootstrap(
     seed: abi.PaymentTransaction, 
@@ -131,6 +134,7 @@ def set_max_auction_number(max_number: abi.Uint64, *, output: abi.Uint64) -> Exp
         output.set(max_number.get())
     )
 
+# the bidder creates new auction
 @mkp_app.external
 def create_auction(quantity: abi.Uint64, price: abi.Uint64, *, output: abi.Uint64) -> Expr:
     return Seq(
@@ -144,6 +148,7 @@ def create_auction(quantity: abi.Uint64, price: abi.Uint64, *, output: abi.Uint6
         output.set(mkp_app.state.auctions_counter.get())
     )
 
+# the seller accept an auction
 @mkp_app.external(authorize=Authorize.only(mkp_app.state.seller.get()))
 def accept_auction(key: abi.Uint64, *, output: abi.Uint64) -> Expr:
     return Seq(
@@ -170,6 +175,7 @@ def remove_auction(key: abi.Uint64, *, output: abi.Uint64) -> Expr:
         output.set(key.get())
     )
 
+# The bidder purchases credits based on their auction.
 @mkp_app.external
 def do_buy_with_auction(
     payment: abi.PaymentTransaction, 
