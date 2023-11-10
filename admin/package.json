@@ -1,5 +1,5 @@
 {
-  "name": "algogreen-cc-mkp",
+  "name": "admin-algogreen",
   "version": "1.0.0",
   "description": "",
   "main": "index.js",
@@ -53,7 +53,7 @@
     "algorand"
   ],
   "author": "a2n.finance",
-  "license": "ISC",
+  "license": "BSL",
   "bugs": {
     "url": "https://github.com/a2nfinance/algogreen/issues"
   },

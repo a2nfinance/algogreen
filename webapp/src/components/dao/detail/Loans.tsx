@@ -68,7 +68,7 @@ export const Loans = () => {
             dataIndex: "status",
             key: "status",
             render: (_, record) => (
-                <Tag>{record.status === 1 ? "active" : "inactive"}</Tag>
+                <Tag>{new Date().getTime() <= record.end_date ? "active" : "expired"}</Tag>
             )
         },
         {
@@ -82,11 +82,13 @@ export const Loans = () => {
                         showLoanModal()
                         // router.push(`/loan/detail/${record._id}`)
                     }}>Detail</Button>
-                    <Button type="primary" onClick={() => {
-                        dispatch(setCurrentLoan(record))
-                        showProposalModal()
-                        // router.push(`/loan/detail/${record._id}`)
-                    }}>Apply</Button>
+                    <Button type="primary"
+                        disabled={new Date().getTime() > record.end_date}
+                        onClick={() => {
+                            dispatch(setCurrentLoan(record))
+                            showProposalModal()
+                            // router.push(`/loan/detail/${record._id}`)
+                        }}>Apply</Button>
 
                 </Space>
 

@@ -1,5 +1,5 @@
 {
-  "name": "algogreen-cc-mkp",
+  "name": "marketplace-algogreen",
   "version": "1.0.0",
   "description": "",
   "main": "index.js",
@@ -48,14 +48,13 @@
   "keywords": [
     "a2n",
     "algogreen",
-    "neow3j",
     "carbon",
-    "credit",
+    "credits",
     "marketplace",
     "algorand"
   ],
   "author": "a2n.finance",
-  "license": "ISC",
+  "license": "BSL",
   "bugs": {
     "url": "https://github.com/a2nfinance/algogreen/issues"
   },

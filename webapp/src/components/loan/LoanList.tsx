@@ -76,7 +76,7 @@ export const LoanList = () => {
             dataIndex: "status",
             key: "status",
             render: (_, record) => (
-                <Tag>{record.status === 1 ? "active" : "inactive"}</Tag>
+                <Tag>{new Date().getTime() <= record.end_date ? "active" : "expired"}</Tag>
             )
         },
         {
@@ -89,7 +89,9 @@ export const LoanList = () => {
                         dispatch(setCurrentLoan(record))
                         showLoanModal()
                     }}>Detail</Button>
-                    <Button type="primary" onClick={() => {
+                    <Button type="primary"
+                        disabled={new Date().getTime() > record.end_date}
+                    onClick={() => {
                         dispatch(setCurrentLoan(record));
                         getDAODetailById(record.dao_id);
                         showProposalModal()

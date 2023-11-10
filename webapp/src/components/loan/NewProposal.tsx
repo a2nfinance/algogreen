@@ -71,6 +71,12 @@ export const NewProposal = () => {
                     </Col>
                 </Row>
                 <Divider />
+                {
+                    loanDetail.require_collateral && <>
+                    <Alert type="info" message={"This loan requires collateral, so you must provide your genuine asset information for approval."}/>
+                    <br/>
+                    </>
+                }
                 <Form.Item name={"description"} label={"Description"} rules={[{ required: true, message: 'Missing description' }]} noStyle>
                     <Input size='large' type='hidden' />
                 </Form.Item>

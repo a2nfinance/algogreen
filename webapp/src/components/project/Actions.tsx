@@ -34,7 +34,7 @@ export const Actions = () => {
             <Divider />
             {(project.creator === activeAccount?.address) && <Space>
                 <Button type="primary" size="large" onClick={() => router.push("/loan/list")}>Borrow ALGO from DAOs</Button>
-                <Button type="primary" size="large" onClick={() => showModal()}>Submit carbon offset credits</Button>
+                <Button disabled={!project.is_eco_project} type="primary" size="large" onClick={() => showModal()}>Submit carbon offset credits</Button>
             </Space>
             }
             <Divider />
@@ -46,7 +46,20 @@ export const Actions = () => {
                         <Form.Item name={"title"} label="Title" rules={[{ required: true, message: 'Missing title' }]}>
                             <Input size='large' />
                         </Form.Item>
-                        <Form.Item name={"total_credits"} label="Total credits (kilograms of carbon offset)" rules={[{ required: true, message: 'Missing total credits' }]}>
+                        <Form.Item name={"total_credits"}
+                            label="Total credits"
+                            rules={[
+                                { required: true, message: 'Missing total credits' },
+                                {
+                                    type: 'integer',
+                                    min: 1,
+                                    transform(value) {
+                                        return Number(value)
+                                    },
+                                }
+                            ]}
+                            extra="The total credits (kilograms of carbon offset) must be an integer; therefore, float numbers cannot be used."
+                        >
                             <Input size='large' type="number" />
                         </Form.Item>
                         <Form.Item name={"proof_document"} label="Proof document" rules={[{ required: true, message: 'Missing proof document', type: "url" }]}>

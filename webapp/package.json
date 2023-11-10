@@ -1,5 +1,5 @@
 {
-  "name": "algogreen-cc-mkp",
+  "name": "defi-algogreen",
   "version": "1.0.0",
   "description": "",
   "main": "index.js",
@@ -48,11 +48,14 @@
   "keywords": [
     "a2n",
     "algogreen",
-    "webapp",
+    "defi",
+    "lending",
+    "borrowing",
+    "loan",
     "algorand"
   ],
   "author": "a2n.finance",
-  "license": "ISC",
+  "license": "BSL",
   "bugs": {
     "url": "https://github.com/a2nfinance/algogreen/issues"
   },
