@@ -1,7 +1,7 @@
 Prerequisite knowledge:
 - Node JS
 - Javascript
-- Installed Fera Wallet.
+- Installed Pera Wallet.
 
 Setup:
 - Copy .env.example to .env

@@ -1,6 +1,6 @@
 import { LinkOutlined } from "@ant-design/icons";
 import { useWallet } from "@txnlab/use-wallet";
-import { Button, Card, Descriptions, Divider, Space } from "antd";
+import { Alert, Button, Card, Descriptions, Divider, Progress, Space, Tooltip } from "antd";
 import { useRouter } from "next/router";
 import { useAppSelector } from "src/controller/hooks";
 import { executeProposal, repayProposal, vote } from "src/core/dao";
@@ -9,26 +9,46 @@ import { useProposal } from "src/hooks/useProposal";
 export const ProposalDetail = () => {
     const { activeAccount, signTransactions, sendTransactions } = useWallet();
     const { voteAction, executeProposalAction, repayAction } = useAppSelector(state => state.process);
-    const { checkPass } = useProposal();
+    const { checkPass, getAgreePercentage, getVoterPercentage } = useProposal();
     const router = useRouter();
     const { proposal, onchainProposal } = useAppSelector(state => state.proposal);
     const { daoFromDB, onchainDAO } = useAppSelector(state => state.daoDetail);
     return (
         <Card title={proposal.title}>
 
-            {!proposal.executed && <Space>
-                <Button loading={voteAction.processing} type="primary" size="large" onClick={() => vote(activeAccount?.address, 1, signTransactions, sendTransactions)}>Agree ({onchainProposal.filter(p => p.key === "agree_counter")[0].value})</Button>
-                <Button loading={voteAction.processing} size="large" onClick={() => vote(activeAccount?.address, 0, signTransactions, sendTransactions)}>Disagree ({onchainProposal.filter(p => p.key === "disagree_counter")[0].value})</Button>
-                {
-                    checkPass(daoFromDB, onchainDAO, onchainProposal) && <Button loading={executeProposalAction.processing} type="primary" onClick={() => executeProposal(activeAccount?.address, signTransactions, sendTransactions)} size="large">Execute & send ALGO to borrower</Button>
-                }
-            </Space>}
+            {!proposal.executed && <>
+                <Space>
+                    <Button loading={voteAction.processing} type="primary" size="large" onClick={() => vote(activeAccount?.address, 1, signTransactions, sendTransactions)}>Agree ({onchainProposal.filter(p => p.key === "agree_counter")[0].value})</Button>
+                    <Button loading={voteAction.processing} size="large" onClick={() => vote(activeAccount?.address, 0, signTransactions, sendTransactions)}>Disagree ({onchainProposal.filter(p => p.key === "disagree_counter")[0].value})</Button>
+                    {
+                        checkPass(daoFromDB, onchainDAO, onchainProposal) && <Button loading={executeProposalAction.processing} type="primary" onClick={() => executeProposal(activeAccount?.address, signTransactions, sendTransactions)} size="large">Execute & send ALGO to borrower</Button>
+                    }
+
+                </Space>
+                <Divider />
+                <Descriptions layout="vertical" column={1}>
+                    <Descriptions.Item label={"Passing threshold"}>
+                        <Tooltip>
+                            <Progress percent={getAgreePercentage(onchainProposal)} success={{ percent: daoFromDB.passing_threshold }} />
+                        </Tooltip>
+                    </Descriptions.Item>
+                    <Descriptions.Item label={"Quorum"}>
+                        <Tooltip>
+                            <Progress percent={getVoterPercentage(onchainDAO, onchainProposal)} success={{ percent: daoFromDB.quorum }} />
+                        </Tooltip>
+                    </Descriptions.Item>
+                    <Descriptions.Item>
+                        <Alert type="info" message="Blue represents the actual voting results, while green signifies the anticipated conditions for the voting outcome. When the blue bar is longer than the green bar, this proposal can be executed." showIcon/>
+                    </Descriptions.Item>
+                </Descriptions>
+
+            </>}
             {
                 (!!proposal.executed && !proposal.is_repaid && activeAccount?.address === proposal.creator) && <Button
                     loading={repayAction.processing}
                     type="primary"
                     onClick={() => repayProposal(activeAccount?.address, signTransactions, sendTransactions)} size="large">
-                    Repay - token amount is {proposal.borrow_amount * (1+proposal.interest_rate/100)} ALGO
+                    Repay - token amount is {proposal.borrow_amount * (1 + proposal.interest_rate / 100)} ALGO
                 </Button>
             }
             <Divider />

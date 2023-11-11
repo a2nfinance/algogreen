@@ -11,7 +11,7 @@ DeFi app: [defi-algogreen](https://defi-algogreen.a2n.finance)
 
 ## System architecture
 
-For more details of Algogreen, you can read [this document](HKT.md)
+For additional information about Algogreen architecture, please refer to [this document](HKT.md)
 
 ## Prerequisites
 
