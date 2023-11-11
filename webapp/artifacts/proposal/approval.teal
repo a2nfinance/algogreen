@@ -156,7 +156,8 @@ retsub
 // opt_in
 optin_1:
 proto 0 0
-retsub
+intc_1 // 1
+return
 
 // vote
 vote_2:
@@ -304,6 +305,8 @@ intc_0 // 0
 ==
 assert
 frame_dig -2
+intc_2 // 10000
+*
 bytec 7 // "borrow_amount"
 app_global_get
 intc_2 // 10000
@@ -311,8 +314,6 @@ bytec 14 // "interest_rate"
 app_global_get
 +
 *
-intc_2 // 10000
-/
 >=
 // amount < repay amount
 assert
@@ -365,16 +366,18 @@ proto 3 1
 frame_dig -2
 bytec_0 // "agree_counter"
 app_global_get
-intc_2 // 10000
-*
-bytec_0 // "agree_counter"
-app_global_get
 bytec_1 // "disagree_counter"
 app_global_get
 +
-/
+*
+bytec_0 // "agree_counter"
+app_global_get
+intc_2 // 10000
+*
 <=
 frame_dig -3
+frame_dig -1
+*
 bytec_0 // "agree_counter"
 app_global_get
 bytec_1 // "disagree_counter"
@@ -382,8 +385,6 @@ app_global_get
 +
 intc_2 // 10000
 *
-frame_dig -1
-/
 <=
 &&
 retsub

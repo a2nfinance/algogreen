@@ -76,9 +76,15 @@ dao_app_client.client.send_transaction(
         sender.private_key
     )
 )    
+
+dao_app_client.client.send_transaction(
+    AssetOptInTxn(proposer.address, sp, membership_token).sign(
+        proposer.private_key
+    )
+)  
 ## Add member
-dao_app_client.fund(4000)
-dao_app_client.call(add_members, new_members=[sender.address, member.address], suggested_params=sp, accounts=[sender.address, member.address], foreign_assets=[membership_token])
+dao_app_client.fund(6000)
+dao_app_client.call(add_members, new_members=[sender.address, member.address, proposer.address], suggested_params=sp, accounts=[sender.address, member.address, proposer.address], foreign_assets=[membership_token])
 
 ## check is_member
 

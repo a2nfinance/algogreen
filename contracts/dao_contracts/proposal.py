@@ -181,7 +181,7 @@ def repay(repay_amount: abi.Uint64, owner: abi.Address) -> Expr:
         Assert(proposal_app.state.owner.get() == owner.get()),
         Assert(proposal_app.state.is_executed.get() == Int(1)),
         Assert(proposal_app.state.is_repaid.get() == Int(0)),
-        Assert(repay_amount.get() >= proposal_app.state.borrow_amount.get() * (Int(10000) + proposal_app.state.interest_rate.get()) / Int(10000), comment="amount < repay amount"),
+        Assert(repay_amount.get() * Int(10000) >= proposal_app.state.borrow_amount.get() * (Int(10000) + proposal_app.state.interest_rate.get()), comment="amount < repay amount"),
         # check time contraints, check allowing repay
         If(proposal_app.state.allow_early_repay.get() == Int(0)).Then(
             Assert(Global.latest_timestamp() >= (proposal_app.state.executed_at.get() + proposal_app.state.term.get() * Int(30) * Int(24) * Int(3600)), comment="Not repay time")
@@ -199,8 +199,8 @@ def get_aggree_counter(*, output: abi.Uint64):
 def is_passed(quorum: abi.Uint64, passing_threshold: abi.Uint64, count_member: abi.Uint64) -> Expr:
     count_all_votes = proposal_app.state.agree_counter.get() + proposal_app.state.disagree_counter.get()
     return And(
-        passing_threshold.get() <= proposal_app.state.agree_counter.get() * Int(10000) / count_all_votes,
-        quorum.get() <= count_all_votes * Int(10000) / count_member.get()
+        passing_threshold.get() * count_all_votes <= proposal_app.state.agree_counter.get() * Int(10000),
+        quorum.get() * count_member.get()  <= count_all_votes * Int(10000)
     )
     
 
