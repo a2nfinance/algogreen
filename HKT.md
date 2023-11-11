@@ -86,11 +86,11 @@ All of our web applications are built on a common architecture. We utilize Beake
 - **Scenario:** Farmers practicing sustainable agriculture seek financial support.
 - **Use Case:** Implement Algogreen to establish DAOs supporting sustainable agriculture. Farmers can access transparent and fair lending programs, issue carbon credits, and contribute to environmentally friendly practices.
 
-## 5. Future development
+## 6. Future development
 
 During our participation in the Hackathon, we've contemplated extensively on Algogreen and its foundational idea. Is this indeed a sound and promising concept? Will it gain support from the community? Will it be competitive enough with other contenders in the future? These are numerous thoughts, and we've also outlined a long-term roadmap to refine Algogreen. However, one important aspect is that we recognize the trustworthiness when developing a product on the Algorand platform. We hope to have the opportunity to continue learning and advancing Algogreen within the Algorand ecosystem, at least for the main purpose of creating something of value for the environment and those involved in environmental work.
 
-## 6. Conclusion
+## 7. Conclusion
 
 The one-month duration of the hackathon may not be long, but during this time, we've learned from the basics to more advanced aspects related to Algorand technology. Despite facing some initial challenges, what we truly experienced was a sense of "wow".
 
