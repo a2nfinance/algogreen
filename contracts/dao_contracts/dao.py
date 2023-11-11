@@ -290,7 +290,7 @@ def repay_proposal(
         InnerTxnBuilder.Submit(),
     )
 
-@dao_app.external
+@dao_app.external(read_only=True)
 def get_minimum_balance(*, output: abi.Uint64) -> Expr:
     return output.set(MinBalance(Global.current_application_address()))
 

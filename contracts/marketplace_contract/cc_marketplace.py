@@ -200,8 +200,6 @@ def do_buy_with_auction(
             payment.get().amount() >= price.get(),
             comment=f"payment must be for >= {price.get()}",
         ),
-        # Check asset balance
-        # Inner transactions
         ## Send NFT asset amount to the buyer (must opted-in)
         InnerTxnBuilder.Begin(),
         InnerTxnBuilder.SetFields(
@@ -261,7 +259,7 @@ def do_buy_without_auction(
 
     )
 
-@mkp_app.external
+@mkp_app.external(read_only=True)
 def get_auction_record(
     key: abi.Uint64, *, output: AuctionRecord
 ) -> Expr:

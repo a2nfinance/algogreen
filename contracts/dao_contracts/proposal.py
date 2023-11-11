@@ -136,9 +136,7 @@ def create(
 # Contains a code placeholder to handle the opt-in action.
 @proposal_app.opt_in
 def opt_in() -> Expr:
-    return Seq(
-        
-    )
+    return Approve()
 
 # A vote must meet the proposal conditions before this action can alter the state of this app.
 @proposal_app.external(authorize= Authorize.only(proposal_app.state.dao_app_address.get()))
@@ -193,7 +191,7 @@ def repay(repay_amount: abi.Uint64, owner: abi.Address) -> Expr:
         proposal_app.state.is_repaid.set(Int(1))
     )
 
-@proposal_app.external
+@proposal_app.external(read_only=True)
 def get_aggree_counter(*, output: abi.Uint64):
     return output.set(proposal_app.state.agree_counter.get())
 
