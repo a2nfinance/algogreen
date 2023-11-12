@@ -114,7 +114,7 @@ export const LayoutProvider = (props: Props) => {
                                     key: '12',
                                     icon: <FaSuperscript />,
                                     label: 'Twitter',
-                                    onClick: () => window.open("https://twitter.com/NeoPay_A2N", "_blank")
+                                    onClick: () => window.open("https://twitter.com/AlgogreenA2N", "_blank")
                                 },
                                 {
                                     key: '13',
