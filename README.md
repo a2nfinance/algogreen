@@ -32,7 +32,7 @@ To understand source code, you should have basic knowlege of:
 
 - Install NodeJS (16+)
 - Install Docker
-- Install Python (3.17+)
+- Install Python (3.7+)
 - Install Algokit
 - Install VisualCode studio.
 - Create a new collection on Mongo Cloud Database.
