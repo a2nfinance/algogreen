@@ -12,11 +12,11 @@ Algogreen can be seen as the beginning of combining ideas from DAOs, DeFi, along
 
 Algogreen is divided into three applications:
 
-**Application 1:** [admin-algogreen](https://admin-algogreen.a2n.finance) allows administrators to review and approve organizations, projects, and carbon offset credits.
+[Admin-Algogreen](https://admin-algogreen.a2n.finance): allows administrators to review and approve organizations, projects, and carbon offset credits.
 
-**Application 2:** [defi-algogreen](https://defi-algogreen.a2n.finance) enables organizations and projects to implement lending and borrowing activities.
+[Defi-Algogreen](https://defi-algogreen.a2n.finance): enables organizations and projects to implement lending and borrowing activities.
 
-**Application 3:** [marketplace-algogreen](https://marketplace-algogreen.a2n.finance) allows the trading of verified carbon credits, providing mechanisms to prevent fraud in transactions
+[Marketplace-Algogreen](https://marketplace-algogreen.a2n.finance): allows the trading of verified carbon credits, providing mechanisms to prevent fraud in transactions
 
 
 ## 3. Key features
