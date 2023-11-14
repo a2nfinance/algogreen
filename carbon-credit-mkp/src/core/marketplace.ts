@@ -191,7 +191,7 @@ export const doBuyWithAuction = async (
 
         const { credit } = store.getState().credit;
         if (buyer !== address) {
-            openNotification("You are not auctioneer.", `You can not buy credits with this auction!`, MESSAGE_TYPE.INFO, () => { });
+            openNotification("You are not the bidder.", `You can not buy credits with this auction!`, MESSAGE_TYPE.INFO, () => { });
             return;
         }
         store.dispatch(updateProcessStatus({
@@ -272,10 +272,70 @@ export const doBuyWithAuction = async (
 
 export const doBuyWithoutAuction = async (
     address: string,
-    appId: number,
-    auctionIndex: number,
     signTransactions: Function,
     sendTransactions: Function
 ) => {
+    try {
+        if (!address) {
+            openNotification("Your wallet is not currently connected.", `To utilize ALGOGREEN features, please connect your wallet.`, MESSAGE_TYPE.INFO, () => { });
+            return;
+        }
+        const { credit } = store.getState().credit;
+        store.dispatch(updateProcessStatus({
+            actionName: actionNames.buyCreditAction,
+            att: processKeys.processing,
+            value: true
+        }))
 
+        const appAddress = algosdk.getApplicationAddress(credit.app_id);
+        const suggestedParams = await algoClient.getTransactionParams().do();
+
+        const optinTxn = algosdk.makeAssetTransferTxnWithSuggestedParamsFromObject({
+            from: address,
+            to: address,
+            amount: 0,
+            assetIndex: credit.asset_id,
+            suggestedParams
+        })
+
+        const paymentTxn = algosdk.makePaymentTxnWithSuggestedParamsFromObject({
+            from: address,
+            to: appAddress,
+            amount: Math.floor(credit.origin_price * 10**6),
+            suggestedParams: { ...suggestedParams, fee: algosdk.ALGORAND_MIN_TX_FEE, flatFee: true },
+            note: (new ABIStringType()).encode("Auction Payment")
+        });
+        const doBuyMethodSelector = algosdk.getMethodByName(contract.methods, 'do_buy_without_auction').getSelector();
+
+        const doBuyAddTxn = algosdk.makeApplicationCallTxnFromObject({
+            from: address,
+            suggestedParams: suggestedParams,
+            appIndex: credit.app_id,
+            onComplete: algosdk.OnApplicationComplete.NoOpOC,
+            appArgs: [
+                doBuyMethodSelector,
+            ],
+            foreignAssets: [credit.asset_id],
+            accounts: [credit.creator],
+        });
+
+        let txnArray = [optinTxn, paymentTxn, doBuyAddTxn];
+        let groupID = algosdk.computeGroupID(txnArray);
+        for (let i = 0; i < 3; i++) txnArray[i].group = groupID;
+        const encodedOptInTransaction = algosdk.encodeUnsignedTransaction(optinTxn);
+        const encodedPaymentTransaction = algosdk.encodeUnsignedTransaction(paymentTxn);
+        const encodedDoBuyTransaction = algosdk.encodeUnsignedTransaction(doBuyAddTxn);
+        const signedTransactions = await signTransactions([encodedOptInTransaction, encodedPaymentTransaction, encodedDoBuyTransaction])
+        const { id, txId, txn } = await sendTransactions(signedTransactions, waitRoundsToConfirm);
+        console.log('Successfully sent transaction. Transaction ID: ', txId)
+        openNotification("Buy credits", `Buy credits successful!`, MESSAGE_TYPE.SUCCESS, () => { })
+    } catch (e) {
+        console.log(e);
+        openNotification("Buy credits", `Buy credits fail!`, MESSAGE_TYPE.ERROR, () => { })
+    }
+    store.dispatch(updateProcessStatus({
+        actionName: actionNames.buyCreditAction,
+        att: processKeys.processing,
+        value: true
+    }))
 }

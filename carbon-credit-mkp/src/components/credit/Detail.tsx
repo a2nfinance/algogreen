@@ -4,7 +4,7 @@ import { useRouter } from "next/router"
 import { useState } from "react"
 import { useAppSelector } from "src/controller/hooks"
 import { TESTNET_EXPLORER, TESTNET_EXPLORER_ADDRESS } from "src/core/constant"
-import { acceptAuction, createAuction, doBuyWithAuction, getAuctions } from "src/core/marketplace"
+import { acceptAuction, createAuction, doBuyWithAuction, doBuyWithoutAuction, getAuctions } from "src/core/marketplace"
 import { useAddress } from "src/hooks/useAddress"
 
 export const Detail = () => {
@@ -79,7 +79,7 @@ export const Detail = () => {
                     <Button size="large" onClick={() => showAuctionModal()} >Show auctions</Button>
                 </Space>
 
-                : <Button>Buy</Button>
+                : <Button onClick={() => doBuyWithoutAuction(activeAccount?.address, signTransactions, sendTransactions)}>Buy</Button>
             }
             <Divider />
             <Descriptions layout="vertical">
