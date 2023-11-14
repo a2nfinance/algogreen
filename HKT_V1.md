@@ -6,8 +6,20 @@ Algogreen offers features that enable DAOs to manage loans, allowing individuals
 
 Algogreen can be seen as the beginning of combining ideas from DAOs, DeFi, along with Real World Assets and a fractionalized NFT marketplace.
 
+## 2. Demo information
 
-## 2. Key features
+[Demo Video]() | [Pitch Deck]()
+
+Algogreen is divided into three applications:
+
+**Application 1:** [admin-algogreen](https://admin-algogreen.a2n.finance) allows administrators to review and approve organizations, projects, and carbon offset credits.
+
+**Application 2:** [defi-algogreen](https://defi-algogreen.a2n.finance) enables organizations and projects to implement lending and borrowing activities.
+
+**Application 3:** [marketplace-algogreen](https://marketplace-algogreen.a2n.finance) allows the trading of verified carbon credits, providing mechanisms to prevent fraud in transactions
+
+
+## 3. Key features
 **Approval system:** All decentralized autonomous organizations (DAOs), projects, or carbon credits must undergo approval with clear project information and content before they can participate in lending, fundraising, or trading on the marketplace.
 
 **DAOs management:** Any verified organization can create on-chain DAOs using Algorand. These organizations can establish lending programs with different interest rates and approve loans through voting on DAO proposals. The process is executed through smart contracts to ensure transparency and clarity.
@@ -19,17 +31,7 @@ Algogreen can be seen as the beginning of combining ideas from DAOs, DeFi, along
 **Decentralized smart contracts:** All DAOs, loan proposals, and carbon credits are managed by separate smart contracts, without any central smart contract playing a role in holding and transferring funds. This reduces financial risks, makes it easy to update and fix errors, and allows for changes.
 
 
-## 3. How Algogreen operates
-
-Algogreen is divided into three applications:
-
-**Application 1:** [admin-algogreen](https://admin-algogreen.a2n.finance) allows administrators to review and approve organizations, projects, and carbon offset credits.
-
-**Application 2:** [defi-algogreen](https://defi-algogreen.a2n.finance) enables organizations and projects to implement lending and borrowing activities.
-
-**Application 3:** [marketplace-algogreen](https://marketplace-algogreen.a2n.finance) allows the trading of verified carbon credits, providing mechanisms to prevent fraud in transactions
-
-
+## 4. How Algogreen operates
 **Basic processes**
 
 ![](/webapp/public/diagrams/basic_flow.jpg)
@@ -58,17 +60,17 @@ Currently, the defi-algogreen application only supports transparency related to 
 ![](https://defi-algogreen.a2n.finance/diagrams/auction_process.jpg)
 
 
-## 4. Technical implementation
+## 5. Technical implementation
 
 ![](https://defi-algogreen.a2n.finance/diagrams/system_architect.jpg)
 
 All of our web applications are built on a common architecture. We utilize Beaker, Pyteal, and Algokit for the development and testing of Algorand applications.
 
-## 5. Future development
+## 6. Future development
 
 During our participation in the Hackathon, we've contemplated extensively on Algogreen and its foundational idea. Is this indeed a sound and promising concept? Will it gain support from the community? Will it be competitive enough with other contenders in the future? These are numerous thoughts, and we've also outlined a long-term roadmap to refine Algogreen. However, one important aspect is that we recognize the trustworthiness when developing a product on the Algorand platform. We hope to have the opportunity to continue learning and advancing Algogreen within the Algorand ecosystem, at least for the main purpose of creating something of value for the environment and those involved in environmental work.
 
-## 6. Conclusion
+## 7. Conclusion
 
 The one-month duration of the hackathon may not be long, but during this time, we've learned from the basics to more advanced aspects related to Algorand technology. Despite facing some initial challenges, what we truly experienced was a sense of "wow".
 
